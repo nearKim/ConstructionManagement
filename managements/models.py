@@ -27,15 +27,5 @@ class Resource(TimeStampedMixin):
     work_package = models.ManyToManyField('managements.WorkPackage', related_name='resources')
 
 
-class Duration(CaculatedMixin):
-    description = models.TextField(_('기간 설명'), blank=True)
-    work_package = models.ManyToManyField('managements.WorkPackage', related_name='durations')
-
-
-class Productivity(CaculatedMixin):
-    description = models.TextField(_('생산성 설명'), blank=True)
-    work_package = models.ManyToManyField('managements.WorkPackage', related_name='productivities')
-
-
 class WorkPackage(TimeStampedMixin):
     package = models.CharField(_('Work Package'), max_length=300)
