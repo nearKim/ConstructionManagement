@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 3rd Party
+    'django_extensions',
 
     # User App
     'managements',
@@ -136,3 +138,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# ERD
+GRAPH_MODELS = {
+  'all_applications': True,
+  'group_models': True,
+}
