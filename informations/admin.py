@@ -1,3 +1,5 @@
 from django.contrib import admin
+from informations.models import *
 
-# Register your models here.
+admin.site.register(ProductivityInfo)
+admin.site.register(DurationInfo)

@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from managements.models import *
+
+admin.site.register(Project)
+admin.site.register(Activity)
+admin.site.register(Resource)
+admin.site.register(WorkPackage)
