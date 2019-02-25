@@ -28,7 +28,11 @@ class ResourceSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ActivityFullSerializer(ActivityBaseSerializer):
-    project = serializers.PrimaryKeyRelatedField(many=True)
-    resource = ResourceSerializer(many=True, read_only=True)
+class ActivityFullSerializer(serializers.ModelSerializer):
+    project = serializers.PrimaryKeyRelatedField(read_only=True)
+    resource = ResourceSerializer(read_only=True)
     work_package = WorkPackageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Activity
+        fields = '__all__'
