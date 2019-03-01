@@ -52,4 +52,7 @@ class Resource(TimeStampedMixin):
 
 class WorkPackage(TimeStampedMixin):
     package = models.CharField(_('워크 패키지'), max_length=300)
-    parent_package = models.ForeignKey('self', default=None, blank=True, null=True, on_delete=models.CASCADE)
+    parent_package = models.ForeignKey('self',
+                                       blank=True,
+                                       null=True,
+                                       on_delete=models.CASCADE)

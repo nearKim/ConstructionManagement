@@ -6,6 +6,7 @@ from managements import views
 router = DefaultRouter()
 router.register(r'projects', views.ProjectViewSet)
 router.register(r'activities', views.ActivityViewSet)
+router.register(r'work-packages', views.WorkPackageViewSet)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
