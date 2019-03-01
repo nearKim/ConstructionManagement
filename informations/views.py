@@ -9,4 +9,7 @@ class DurationInfoViewSet(viewsets.ModelViewSet):
     serializer_class = DurationInfoSerializer
     queryset = DurationInfo.objects.select_related('datainfo_ptr').all()
 
-# Create your views here.
+
+class ProductivityInfoViewSet(viewsets.ModelViewSet):
+    serializer_class = ProductivityInfo
+    queryset = ProductivityInfo.objects.select_related('datainfo_ptr').all()
