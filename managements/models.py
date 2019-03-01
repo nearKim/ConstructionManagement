@@ -30,19 +30,6 @@ class Activity(TimeStampedMixin):
                              on_delete=models.SET_NULL)
     quantity = models.IntegerField(_('물량'), default=0, null=True, blank=True)
 
-    def clean(self):
-        if self.resource is None and self.quantity is not None:
-            raise ValidationError(_('리소스가 없는 경우 물량은 존재할 수 없습니다.'))
-        if self.resource is not None and self.quantity is None:
-            raise ValidationError(_('리소스가 존재하는 경우 반드시 물량이 존재해야 합니다. 데이터를 확인하십시오.'))
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-
-        # productivity 는 아래 공식으로 무조건 채워져야 한다.
-        self.productivity = self.quantity / (self.labor_cnt * self.duration)
-        return super(Activity, self).save(*args, **kwargs)
-
 
 class Resource(TimeStampedMixin):
     name = models.CharField(_('리소스 이름'), max_length=300)
