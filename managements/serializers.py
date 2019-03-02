@@ -24,12 +24,18 @@ class WorkPackageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ResourceSerializer(serializers.ModelSerializer):
-    work_package = WorkPackageSerializer(many=True, read_only=True)
-
+class ResourceBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resource
         fields = '__all__'
+
+
+class ResourceCreateUpdateSerializer(ResourceBaseSerializer):
+    work_package = serializers.PrimaryKeyRelatedField(many=True, queryset=WorkPackage.objects.all())
+
+
+class ResourceRetrieveListSerializer(ResourceBaseSerializer):
+    work_package = WorkPackageSerializer(many=True, read_only=True)
 
 
 class ActivityCreateUpdateSerializer(ActivityBaseSerializer):
@@ -56,5 +62,5 @@ class ActivityCreateUpdateSerializer(ActivityBaseSerializer):
 
 class ActivityRetrieveListSerializer(ActivityBaseSerializer):
     project = serializers.PrimaryKeyRelatedField(read_only=True)
-    resource = ResourceSerializer(read_only=True)
+    resource = ResourceRetrieveListSerializer(read_only=True)
     work_package = WorkPackageSerializer(many=True, read_only=True)
