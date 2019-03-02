@@ -14,19 +14,25 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 
 class ActivityViewSet(viewsets.ModelViewSet):
-    queryset = Activity.objects \
-        .select_related('project') \
-        .prefetch_related('resource') \
-        .prefetch_related('work_package') \
-        .all()
-
-    # serializer_class = ActivityCreateUpdateSerializer
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
             return ActivityRetrieveListSerializer
         else:
             return ActivityCreateUpdateSerializer
+
+    def get_queryset(self):
+        query_string = self.request.query_params.get('work_package', None)
+        queryset = Activity.objects \
+            .select_related('project') \
+            .prefetch_related('resource') \
+            .prefetch_related('work_package') \
+            .all()
+
+        if query_string:
+            work_packages = [query_string] if not isinstance(query_string, list) else query_string
+            return queryset.filter(work_package__in=work_packages)
+        return queryset
 
     def update(self, request, *args, **kwargs):
         # PATCH와 PUT을 통합한다
@@ -67,13 +73,20 @@ class WorkPackageViewSet(viewsets.ModelViewSet):
 
 
 class ResourceViewSet(viewsets.ModelViewSet):
-    queryset = Resource.objects.all()
+    # queryset = Resource.objects.all()
 
     def get_serializer_class(self):
         if self.action in ['retrieve', 'list']:
             return ResourceRetrieveListSerializer
         else:
             return ResourceCreateUpdateSerializer
+
+    def get_queryset(self):
+        query_string = self.request.query_params.get('work_package', None)
+        if query_string:
+            work_packages = [query_string] if not isinstance(query_string, list) else query_string
+            return Resource.objects.filter(work_package__in=work_packages).all()
+        return Resource.objects.all()
 
     def update(self, request, *args, **kwargs):
         # PATCH와 PUT을 통합한다
