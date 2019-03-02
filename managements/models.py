@@ -12,6 +12,7 @@ class Project(TimeStampedMixin):
 
 
 class Activity(TimeStampedMixin):
+    activity_id=models.CharField(_('액티비티 Id'), max_length=100, primary_key=True)
     name = models.CharField(_('액티비티 이름'), max_length=300)
     description = models.TextField(_('액티비티 설명'), blank=True)
     duration = models.PositiveIntegerField(_('기간'), default=0)
