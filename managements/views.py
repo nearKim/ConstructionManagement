@@ -1,14 +1,17 @@
 import csv
 import io
+import json
 
 import pandas as pd
 from django.db import IntegrityError
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.status import HTTP_207_MULTI_STATUS
+from rest_framework.status import HTTP_207_MULTI_STATUS, HTTP_400_BAD_REQUEST
 
 from ConstructionManagement.helper import batch_create_workpackages
+from informations.models import DurationInfo, ProductivityInfo
 from managements.models import *
 from managements.serializers import ProjectBaseSerializer, ActivityCreateUpdateSerializer, \
     ActivityRetrieveListSerializer, WorkPackageSerializer, ResourceRetrieveListSerializer, \
@@ -55,6 +58,87 @@ class ActivityViewSet(viewsets.ModelViewSet):
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)
+
+    @action(detail=True, methods=['GET'])
+    def work_packages(self, request, pk=None):
+        work_packages = self.get_object().work_package.all()
+        serializer = WorkPackageSerializer(work_packages, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['POST'], url_path='informations/(?P<data_id>[a-zA-Z0-9_]+)')
+    def information(self, request, pk=None, data_id=None):
+        # Activity와 activity가 가지고 있는 work package들을 불러온다
+        activity = self.get_object()
+        work_packages = activity.work_package.all()
+
+        # Querystring 및 데이터들을 갖고온다
+        link = json.loads(request.query_params.get('link', 'false'))
+        value_type = request.query_params.get('type', None)
+        description = request.data.get('description', '')
+
+        # link가 없거나 false인 경우 새로 DataInfo를 생성하는 것이다.
+        if not link:
+            # type이 없으면 400을 띄운다.
+            if not value_type:
+                return Response(status=HTTP_400_BAD_REQUEST, data='No type')
+            if value_type == 'productivity':
+                # type이 productivity라면 ProductivityInfo를 생성한다.
+                data = ProductivityInfo.objects.create(
+                    data_id=data_id,
+                    data_cnt=1,
+                    mean=activity.productivity,
+                    maximum=activity.productivity,
+                    minimum=activity.productivity,
+                    use_duration=False,
+                    description=description
+                )
+            elif value_type == 'duration':
+                # type이 duration이라면 DurationInfo를 생성한다.
+                data = DurationInfo.objects.create(
+                    data_id=data_id,
+                    data_cnt=1,
+                    mean=activity.duration,
+                    maximum=activity.duration,
+                    minimum=activity.duration,
+                    use_duration=True,
+                    description=description
+                )
+            # work_package 등록
+            data.work_package.add(*work_packages)
+
+            # activity의 data 정보 업데이트
+            activity.data = data
+            activity.save()
+            return Response('Success')
+        else:
+            # link가 존재하는 경우 기존의 DataInfo와 링크하는 것이다.
+            data = get_object_or_404(DataInfo, data_id=data_id)
+
+            # Information의 use_duration 플래그는 현재 들어온 Activity의 타입과 반드시 일치해야 한다.
+            if value_type == 'duration' and not data.use_duration:
+                return Response(status=HTTP_400_BAD_REQUEST,
+                                data='ProductivityInfo cannot be updated with Duration type.')
+            elif value_type == 'productivity' and data.use_duration:
+                return Response(status=HTTP_400_BAD_REQUEST,
+                                data='DurationInfo cannot be updated with Productivity type.')
+
+            # activity의 data 정보 업데이트
+            activity.data = data
+            activity.save()
+
+            # 데이터 갯수는 어떠한 경우에도 업데이트 한다
+            data.data_cnt = data.data_cnt + 1
+            # Data를 업데이트할 타겟 값은 type에 따라 다르게 선택한다
+            target_value = activity.duration if value_type == 'duration' else activity.productivity
+
+            # mean, max, min을 모두 업데이트 한다
+            data.mean = (data.mean * (data.data_cnt - 1) + target_value) / data.data_cnt
+            data.maximum = max(data.maximum, target_value)
+            data.minimum = min(data.minimum, target_value)
+
+            # 데이터 업데이트
+            data.save()
+            return Response('success')
 
     @action(detail=False, methods=['POST'])
     def csv_import(self, request):
@@ -153,7 +237,6 @@ class WorkPackageViewSet(viewsets.ModelViewSet):
 
 
 class ResourceViewSet(viewsets.ModelViewSet):
-    # queryset = Resource.objects.all()
 
     def get_serializer_class(self):
         if self.action in ['retrieve', 'list']:
