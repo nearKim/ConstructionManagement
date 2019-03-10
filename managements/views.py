@@ -150,13 +150,13 @@ class ActivityViewSet(viewsets.ModelViewSet):
         io_string = io.StringIO(decoded_file)
 
         # FIXME: name, description을 추가한 리스트로 교체하기
-        # STANDARD = ['activityID','name', 'description', 'projectID', 'duration', 'productivity', 'resourceID', 'numofLabour']
-        STANDARD = ['activityID', 'projectID', 'duration', 'productivity', 'resourceID', 'numofLabour']
+        # non_work_packages = ['activityID','name', 'description', 'projectID', 'duration', 'productivity', 'resourceID', 'numofLabour']
+        non_work_packages = ['activityID', 'projectID', 'duration', 'productivity', 'resourceID', 'numofLabour']
 
         df = pd.read_csv(io_string)
 
         # 먼저 WorPackage 컬럼만으로 구성된 dataframe을 사용해서 WorkPackage들을 생성하고 대분류를 가져온다.
-        parent_packages = batch_create_workpackages(df[df.columns.difference(STANDARD)])
+        parent_packages = batch_create_workpackages(df[df.columns.difference(non_work_packages)])
 
         # 파싱 결과를 넣어줄 dictionary를 초기화하고 200여부를 판단할 flag도 초기화한다.
         result = {
@@ -276,13 +276,13 @@ class ResourceViewSet(viewsets.ModelViewSet):
         io_string = io.StringIO(decoded_file)
 
         # FIXME: productivity 추가한 리스트로 교체하기
-        # STANDARD = ['resourceId', 'resourceName', 'productivity']
-        STANDARD = ['resourceID', 'resourceName', 'productivity']
+        # non_work_packages = ['resourceId', 'resourceName', 'productivity']
+        non_work_packages = ['resourceID', 'resourceName', 'productivity']
 
         df = pd.read_csv(io_string)
 
         # 먼저 WorPackage 컬럼만으로 구성된 dataframe을 사용해서 WorkPackage들을 생성하고 대분류를 가져온다.
-        parent_packages = batch_create_workpackages(df[df.columns.difference(STANDARD)])
+        parent_packages = batch_create_workpackages(df[df.columns.difference(non_work_packages)])
 
         # 파싱 결과를 넣어줄 dictionary를 초기화하고 200여부를 판단할 flag도 초기화한다.
         result = {
