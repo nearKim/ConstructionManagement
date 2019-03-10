@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from rest_framework import viewsets
+from rest_framework.decorators import action
 
 from informations.models import DurationInfo, ProductivityInfo
-from informations.serializers import DurationInfoSerializer
+from informations.serializers import DurationInfoSerializer, ProductivityInfoSerializer
 
 
 class DurationInfoViewSet(viewsets.ModelViewSet):
@@ -11,5 +12,5 @@ class DurationInfoViewSet(viewsets.ModelViewSet):
 
 
 class ProductivityInfoViewSet(viewsets.ModelViewSet):
-    serializer_class = ProductivityInfo
+    serializer_class = ProductivityInfoSerializer
     queryset = ProductivityInfo.objects.select_related('datainfo_ptr').all()
