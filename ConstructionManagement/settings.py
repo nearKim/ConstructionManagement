@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     # User App
     'managements',
     'informations',
+    'frontend',
 ]
 
 MIDDLEWARE = [
