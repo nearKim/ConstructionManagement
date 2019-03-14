@@ -10,12 +10,18 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_207_MULTI_STATUS, HTTP_400_BAD_REQUEST
 
+from ConstructionManagement.constants import InfoType
 from ConstructionManagement.helper import batch_create_workpackages
 from informations.models import DurationInfo, ProductivityInfo
 from managements.models import *
-from managements.serializers import ProjectBaseSerializer, ActivityCreateUpdateSerializer, \
-    ActivityRetrieveListSerializer, WorkPackageSerializer, ResourceRetrieveListSerializer, \
+from managements.serializers import (
+    ProjectBaseSerializer,
+    ActivityCreateUpdateSerializer,
+    ActivityRetrieveListSerializer,
+    WorkPackageSerializer,
+    ResourceRetrieveListSerializer,
     ResourceCreateUpdateSerializer
+)
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -81,7 +87,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
             # type이 없으면 400을 띄운다.
             if not value_type:
                 return Response(status=HTTP_400_BAD_REQUEST, data='No type')
-            if value_type == 'productivity':
+            if value_type == InfoType.PRODUCTIVITY:
                 # type이 productivity라면 ProductivityInfo를 생성한다.
                 data = ProductivityInfo.objects.create(
                     data_id=data_id,
@@ -92,7 +98,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
                     use_duration=False,
                     description=description
                 )
-            elif value_type == 'duration':
+            elif value_type == InfoType.DURATION:
                 # type이 duration이라면 DurationInfo를 생성한다.
                 data = DurationInfo.objects.create(
                     data_id=data_id,
@@ -115,10 +121,10 @@ class ActivityViewSet(viewsets.ModelViewSet):
             data = get_object_or_404(DataInfo, data_id=data_id)
 
             # Information의 use_duration 플래그는 현재 들어온 Activity의 타입과 반드시 일치해야 한다.
-            if value_type == 'duration' and not data.use_duration:
+            if value_type == InfoType.DURATION and not data.use_duration:
                 return Response(status=HTTP_400_BAD_REQUEST,
                                 data='ProductivityInfo cannot be updated with Duration type.')
-            elif value_type == 'productivity' and data.use_duration:
+            elif value_type == InfoType.PRODUCTIVITY and data.use_duration:
                 return Response(status=HTTP_400_BAD_REQUEST,
                                 data='DurationInfo cannot be updated with Productivity type.')
 
@@ -129,7 +135,8 @@ class ActivityViewSet(viewsets.ModelViewSet):
             # 데이터 갯수는 어떠한 경우에도 업데이트 한다
             data.data_cnt = data.data_cnt + 1
             # Data를 업데이트할 타겟 값은 type에 따라 다르게 선택한다
-            target_value = activity.duration if value_type == 'duration' else activity.productivity
+            # FIXME: 엉뚱한 문자열도 Productivity로 진행할 가능성이 있다
+            target_value = activity.duration if value_type == InfoType.DURATION else activity.productivity
 
             # mean, max, min을 모두 업데이트 한다
             data.mean = (data.mean * (data.data_cnt - 1) + target_value) / data.data_cnt
