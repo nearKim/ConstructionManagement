@@ -1,4 +1,4 @@
-{% load static %}
+{% load render_bundle from webpack_loader %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,7 +8,8 @@
 </head>
 <body>
 <div id="root"></div>
+{% render_bundle 'main' %}
 </body>
-{% load static %}
-<script src="{% static "frontend/frontend.bundle.js" %}"></script>
+{#{% load static %}#}
+{#<script src="{% static "frontend/frontend.bundle.js" %}"></script>#}
 </html>
