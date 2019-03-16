@@ -178,7 +178,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
             # 지금 iteration 돌고있는 row에 해당하는 소분류 Work Package 리스트를 모은다.
             child_packages = list(
                 map(
-                    lambda p: WorkPackage.objects.get(parent_package=p, package=row[p.package]),
+                    lambda p: WorkPackage.objects.get(parent_package=p, package_name=row[p.package]),
                     parent_packages
                 )
             )
@@ -304,7 +304,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
             # 지금 iteration 돌고있는 row에 해당하는 소분류 Work Package 리스트를 모은다.
             child_packages = list(
                 map(
-                    lambda p: WorkPackage.objects.get(parent_package=p, package=row[p.package]),
+                    lambda p: WorkPackage.objects.get(parent_package=p, package_name=row[p.package]),
                     parent_packages
                 )
             )

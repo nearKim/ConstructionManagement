@@ -39,11 +39,11 @@ class Resource(TimeStampedMixin):
 
 
 class WorkPackage(TimeStampedMixin):
-    package = models.CharField(_('워크 패키지'), max_length=300)
+    package_name = models.CharField(_('워크 패키지'), max_length=300)
     parent_package = models.ForeignKey('self',
                                        blank=True,
                                        null=True,
                                        on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('package', 'parent_package')
+        unique_together = ('package_name', 'parent_package')
