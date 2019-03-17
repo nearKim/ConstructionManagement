@@ -1,13 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Main from './components/Main'
+import ConstructionManagement from './scenes/ConstructionManagement'
 
 
 const root = document.getElementById('root')
 
 if (root) {
     ReactDOM.render(
-        <Main />,
+        <ConstructionManagement />,
         root
     )
 }
