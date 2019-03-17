@@ -1,4 +1,8 @@
-import { InformationType } from '../constants'
+import {InformationType} from '../constants'
+import fetch from '../../common/utils'
+
+//FIXME: 환경변수로 포함
+let API_V1_ENDPOINT = 'http://localhost:8000/api/v1'
 
 /**
  * 프로젝트 API
@@ -44,7 +48,7 @@ export function deleteProject(projectId) {
  */
 export function getActivities(workPackages) {
     let queryRoot = '?work_package='
-    let query = workPackages ? queryRoot + workPackages.join(queryRoot) : null
+    let query = workPackages ? queryRoot + workPackages.join(queryRoot) : ''
 
     return fetch(`${API_V1_ENDPOINT}/activities${query}`)
 }
@@ -78,7 +82,7 @@ export function deleteActivity(activityId) {
     })
 }
 
-export function makeActivityData(activityId, dataId = null, type, link = null, description = '') {
+export function makeActivityData(activityId, dataId = '', type, link = '', description = '') {
     let query = `?type=${type}&link=${link}`
     return fetch(`${API_V1_ENDPOINT}/activities/${activityId}/information/${dataId}` + query, {
         method: 'POST',
@@ -104,7 +108,7 @@ export function importActivityCSV(csvFile) {
 
 export function getResources(workPackages) {
     let queryRoot = '?work_package='
-    let query = workPackages ? queryRoot + workPackages.join(queryRoot) : null
+    let query = workPackages ? queryRoot + workPackages.join(queryRoot) : ''
     return fetch(`${API_V1_ENDPOINT}/resources${query}`)
 }
 
@@ -190,7 +194,7 @@ export function deleteWorkPackage(workPackageId) {
 
 export function getDurationInfos(workPackages) {
     let queryRoot = '?work_package='
-    let query = workPackages ? queryRoot + workPackages.join(queryRoot) : null
+    let query = workPackages ? queryRoot + workPackages.join(queryRoot) : ''
 
     return fetch(`${API_V1_ENDPOINT}/duration-infos${query}`)
 }
@@ -229,7 +233,7 @@ export function deleteDurationInfo(dataId) {
 
 export function getProductivityInfos(workPackages) {
     let queryRoot = '?work_package='
-    let query = workPackages ? queryRoot + workPackages.join(queryRoot) : null
+    let query = workPackages ? queryRoot + workPackages.join(queryRoot) : ''
 
     return fetch(`${API_V1_ENDPOINT}/productivity-infos${query}`)
 }
