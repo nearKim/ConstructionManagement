@@ -11,6 +11,10 @@ export function fetch(input, init = {}) {
  */
 export function convertData4BootstrapTable(dataArr) {
     dataArr.map(data => {
+        // created와 updated는 빼줍시다
+        delete data.created
+        delete data.modified
+
         // WorPackage가 있는 경우 대,소분류 나눠서 각각 넣어준다
         if (data['work_package']) {
             let workPackages = data.work_package
