@@ -12,7 +12,7 @@ export function getProjects() {
 }
 
 export function getProject(projectId) {
-    return fetch(`${API_V1_ENDPOINT}/projects/${projectId}`)
+    return fetch(`${API_V1_ENDPOINT}/projects/${projectId}/`)
 }
 
 export function createProject(projectName, projectDescription) {
@@ -20,9 +20,9 @@ export function createProject(projectName, projectDescription) {
         name: projectName,
         description: projectDescription
     })
-    return fetch(`${API_V1_ENDPOINT}/projects`, {
+    return fetch(`${API_V1_ENDPOINT}/projects/`, {
         method: 'POST',
-        data: data
+        body: data
     })
 }
 
@@ -31,14 +31,14 @@ export function editProject(projectName, projectDescription) {
         name: projectName,
         description: projectDescription
     })
-    return fetch(`${API_V1_ENDPOINT}/projects`, {
+    return fetch(`${API_V1_ENDPOINT}/projects/`, {
         method: 'PUT',
-        data: data
+        body: data
     })
 }
 
 export function deleteProject(projectId) {
-    return fetch(`${API_V1_ENDPOINT}/projects/${projectId}`, {
+    return fetch(`${API_V1_ENDPOINT}/projects/${projectId}/`, {
         method: 'DELETE'
     })
 }
@@ -54,39 +54,39 @@ export function getActivities(workPackages) {
 }
 
 export function getActivity(activityId) {
-    return fetch(`${API_V1_ENDPOINT}/activities/${activityId}`)
+    return fetch(`${API_V1_ENDPOINT}/activities/${activityId}/`)
 }
 
 export function getActivityWorkPackages(activityId) {
-    return fetch(`${API_V1_ENDPOINT}/activities/${activityId}/work_packages`)
+    return fetch(`${API_V1_ENDPOINT}/activities/${activityId}/work_packages/`)
 
 }
 
 export function createActivity(createData) {
-    return fetch(`${API_V1_ENDPOINT}/activities`, {
+    return fetch(`${API_V1_ENDPOINT}/activities/`, {
         method: 'POST',
-        data: createData
+        body: createData
     })
 }
 
 export function editActivity(activityId, editData) {
-    return fetch(`${API_V1_ENDPOINT}/activities/${activityId}`, {
+    return fetch(`${API_V1_ENDPOINT}/activities/${activityId}/`, {
         method: 'PUT',
-        data: editData
+        body: editData
     })
 }
 
 export function deleteActivity(activityId) {
-    return fetch(`${API_V1_ENDPOINT}/activities/${activityId}`, {
+    return fetch(`${API_V1_ENDPOINT}/activities/${activityId}/`, {
         method: 'DELETE'
     })
 }
 
 export function makeActivityData(activityId, dataId = '', type, link = '', description = '') {
     let query = `?type=${type}&link=${link}`
-    return fetch(`${API_V1_ENDPOINT}/activities/${activityId}/information/${dataId}` + query, {
+    return fetch(`${API_V1_ENDPOINT}/activities/${activityId}/information/${dataId}/` + query, {
         method: 'POST',
-        data: {
+        body: {
             description: description
         }
     })
@@ -95,10 +95,11 @@ export function makeActivityData(activityId, dataId = '', type, link = '', descr
 export function importActivityCSV(csvFile) {
     let formData = new FormData()
     formData.append('file', csvFile)
-
-    return fetch(`${API_V1_ENDPOINT}/activities/csv-import`, {
+    console.log(formData)
+    console.log(csvFile)
+    return fetch(`${API_V1_ENDPOINT}/activities/csv_import/`, {
         method: 'POST',
-        data: formData
+        body: formData
     })
 }
 
@@ -113,20 +114,20 @@ export function getResources(workPackages) {
 }
 
 export function getResource(resourceId) {
-    return fetch(`${API_V1_ENDPOINT}/resources/${resourceId}`)
+    return fetch(`${API_V1_ENDPOINT}/resources/${resourceId}/`)
 }
 
 export function createResource(createData) {
-    return fetch(`${API_V1_ENDPOINT}/resources`, {
+    return fetch(`${API_V1_ENDPOINT}/resources/`, {
         method: 'POST',
-        data: createData
+        body: createData
     })
 }
 
 export function editResource(resourceId, editData) {
-    return fetch(`${API_V1_ENDPOINT}/resources/${resourceId}`, {
+    return fetch(`${API_V1_ENDPOINT}/resources/${resourceId}/`, {
         method: 'PUT',
-        data: editData
+        body: editData
     })
 }
 
@@ -140,9 +141,9 @@ export function importResourceCSV(csvFile) {
     let formData = new FormData()
     formData.append('file', csvFile)
 
-    return fetch(`${API_V1_ENDPOINT}/activities/csv-import`, {
+    return fetch(`${API_V1_ENDPOINT}/activities/csv_import/`, {
         method: 'POST',
-        data: formData
+        body: formData
     })
 }
 
@@ -151,11 +152,11 @@ export function importResourceCSV(csvFile) {
  */
 
 export function getWorkPackages() {
-    return fetch(`${API_V1_ENDPOINT}/work-packages`)
+    return fetch(`${API_V1_ENDPOINT}/work-packages/`)
 }
 
 export function getWorkPackage(workPackageId) {
-    return fetch(`${API_V1_ENDPOINT}/work-packages/${workPackageId}`)
+    return fetch(`${API_V1_ENDPOINT}/work-packages/${workPackageId}/`)
 }
 
 export function createWorkPackage(packageName, parentPackage) {
@@ -164,9 +165,9 @@ export function createWorkPackage(packageName, parentPackage) {
         parent_package: parentPackage
     })
 
-    return fetch(`${API_V1_ENDPOINT}/work-packages`, {
+    return fetch(`${API_V1_ENDPOINT}/work-packages/`, {
         method: 'POST',
-        data: createData
+        body: createData
     })
 }
 
@@ -176,14 +177,14 @@ export function editWorkPackage(workPackageId, packageName, parentPackage) {
         parent_package: parentPackage
     })
 
-    return fetch(`${API_V1_ENDPOINT}/work-packages/${workPackageId}`, {
+    return fetch(`${API_V1_ENDPOINT}/work-packages/${workPackageId}/`, {
         method: 'PUT',
-        data: editData
+        body: editData
     })
 }
 
 export function deleteWorkPackage(workPackageId) {
-    return fetch(`${API_V1_ENDPOINT}/work-packages/${workPackageId}`, {
+    return fetch(`${API_V1_ENDPOINT}/work-packages/${workPackageId}/`, {
         method: 'DELETE',
     })
 }
@@ -200,29 +201,29 @@ export function getDurationInfos(workPackages) {
 }
 
 export function getDurationInfo(dataId) {
-    return fetch(`${API_V1_ENDPOINT}/duration-infos/${dataId}`)
+    return fetch(`${API_V1_ENDPOINT}/duration-infos/${dataId}/`)
 }
 
 export function getDurationInfoActivities(dataId) {
-    return fetch(`${API_V1_ENDPOINT}/duration-infos/${dataId}/activities`)
+    return fetch(`${API_V1_ENDPOINT}/duration-infos/${dataId}/activities/`)
 }
 
 export function createDurationInfo(createData) {
-    return fetch(`${API_V1_ENDPOINT}/duration-infos`, {
+    return fetch(`${API_V1_ENDPOINT}/duration-infos/`, {
         method: 'POST',
-        data: createData
+        body: createData
     })
 }
 
 export function editDurationInfo(dataId, editData) {
-    return fetch(`${API_V1_ENDPOINT}/duration-infos/${dataId}`, {
+    return fetch(`${API_V1_ENDPOINT}/duration-infos/${dataId}/`, {
         method: 'PUT',
-        data: editData
+        body: editData
     })
 }
 
 export function deleteDurationInfo(dataId) {
-    return fetch(`${API_V1_ENDPOINT}/duration-infos/${dataId}`, {
+    return fetch(`${API_V1_ENDPOINT}/duration-infos/${dataId}/`, {
         method: 'DELETE'
     })
 }
@@ -235,33 +236,33 @@ export function getProductivityInfos(workPackages) {
     let queryRoot = '?work_package='
     let query = workPackages ? queryRoot + workPackages.join(queryRoot) : ''
 
-    return fetch(`${API_V1_ENDPOINT}/productivity-infos${query}`)
+    return fetch(`${API_V1_ENDPOINT}/productivity-infos/${query}`)
 }
 
 export function getProductivityInfo(dataId) {
-    return fetch(`${API_V1_ENDPOINT}/productivity-infos/${dataId}`)
+    return fetch(`${API_V1_ENDPOINT}/productivity-infos/${dataId}/`)
 }
 
 export function getProductivityInfoActivities(dataId) {
-    return fetch(`${API_V1_ENDPOINT}/productivity-infos/${dataId}/activities`)
+    return fetch(`${API_V1_ENDPOINT}/productivity-infos/${dataId}/activities/`)
 }
 
 export function createProductivityInfo(createData) {
-    return fetch(`${API_V1_ENDPOINT}/productivity-infos`, {
+    return fetch(`${API_V1_ENDPOINT}/productivity-infos/`, {
         method: 'POST',
-        data: createData
+        body: createData
     })
 }
 
 export function editProductivityInfo(dataId, editData) {
-    return fetch(`${API_V1_ENDPOINT}/productivity-infos/${dataId}`, {
+    return fetch(`${API_V1_ENDPOINT}/productivity-infos/${dataId}/`, {
         method: 'PUT',
-        data: editData
+        body: editData
     })
 }
 
 export function deleteProductivityInfo(dataId) {
-    return fetch(`${API_V1_ENDPOINT}/productivity-infos/${dataId}`, {
+    return fetch(`${API_V1_ENDPOINT}/productivity-infos/${dataId}/`, {
         method: 'DELETE'
     })
 }
