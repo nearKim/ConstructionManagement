@@ -4,12 +4,15 @@ import WorkPackageFilter from '../../components/WorkPacakgeFilter'
 import {Button} from 'reactstrap';
 import * as api from '../../common/api'
 import Table from "../../components/Table";
+import CsvModal from "../../components/CsvModal";
 
 export default class ConstructionManagement extends Component {
     constructor(props) {
         super(props)
         this.state = {
             initialized: false,
+            showModal: false,
+            modalType: '',
             projects: [],
             activities: [],
             workPackages: [],
@@ -46,8 +49,19 @@ export default class ConstructionManagement extends Component {
         )
     }
 
+    showModal(modalType) {
+        this.setState({
+            showModal: true,
+            modalType: modalType
+        })
+    }
+
+    toggleModal() {
+        this.setState(({showModal}) => ({showModal: !showModal}))
+    }
 
     render() {
+        let modalTitle = this.state.modalType == 'activity' ? 'Activity CSV Import' : 'Resource CSV Import'
         return (
             this.state.initialized ?
                 <div>
@@ -59,14 +73,16 @@ export default class ConstructionManagement extends Component {
                             </div>
                             <SearchBar/>
                             <WorkPackageFilter/>
-                            {/* Activity List */}
-                            <Table data={this.state.activities}/>
                             {/* Project List */}
                             <Table data={this.state.projects}/>
+                            {/* Activity List */}
+                            <Table data={this.state.activities}/>
                         </div>
                         <div id="other-btn-container" className="col-sm-2">
-                            <Button outline color="secondary">액티비티 일괄 추가</Button>
-                            <Button outline color="secondary">리소스 일괄 추가</Button>
+                            <Button outline color="secondary" onClick={() => this.showModal('activity')}>액티비티 일괄
+                                추가</Button>
+                            <Button outline color="secondary" onClick={() => this.showModal('resource')}>리소스 일괄
+                                추가</Button>
                             <Button outline color="primary">연결하기</Button>
                         </div>
                         <div id="information-container" className="col-sm-5">
@@ -82,6 +98,11 @@ export default class ConstructionManagement extends Component {
                             <Table data={this.state.productivityInfos}/>
                         </div>
                     </div>
+                    <CsvModal modalType={this.state.modalType}
+                              showModal={this.state.showModal}
+                              modalTitle={modalTitle}
+                              toggleModalHandler={() => this.toggleModal()}
+                    />
                 </div>
                 : null
         )
