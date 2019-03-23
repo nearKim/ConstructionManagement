@@ -152,7 +152,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
         file = request.FILES.get('file', None)
         # 파일이 없으면 404를 띄운다
         if not file:
-            return Response(content={'error': 'No file submitted'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(data={'error': 'No file submitted'}, status=status.HTTP_404_NOT_FOUND)
         decoded_file = file.read().decode('utf-8')
         io_string = io.StringIO(decoded_file)
 
@@ -162,7 +162,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
 
         df = pd.read_csv(io_string)
 
-        # 먼저 WorPackage 컬럼만으로 구성된 dataframe을 사용해서 WorkPackage들을 생성하고 대분류를 가져온다.
+        # 먼저 WorkPackage 컬럼만으로 구성된 dataframe을 사용해서 WorkPackage들을 생성하고 대분류를 가져온다.
         parent_packages = batch_create_workpackages(df[df.columns.difference(non_work_packages)])
 
         # 파싱 결과를 넣어줄 dictionary를 초기화하고 200여부를 판단할 flag도 초기화한다.
@@ -178,7 +178,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
             # 지금 iteration 돌고있는 row에 해당하는 소분류 Work Package 리스트를 모은다.
             child_packages = list(
                 map(
-                    lambda p: WorkPackage.objects.get(parent_package=p, package_name=row[p.package]),
+                    lambda p: WorkPackage.objects.get(parent_package=p, package_name=row[p.package_name]),
                     parent_packages
                 )
             )
@@ -278,7 +278,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
         file = request.FILES.get('file', None)
         # 파일이 없으면 404를 띄운다
         if not file:
-            return Response(content={'error': 'No file submitted'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(data={'error': 'No file submitted'}, status=status.HTTP_404_NOT_FOUND)
         decoded_file = file.read().decode('utf-8')
         io_string = io.StringIO(decoded_file)
 
@@ -304,7 +304,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
             # 지금 iteration 돌고있는 row에 해당하는 소분류 Work Package 리스트를 모은다.
             child_packages = list(
                 map(
-                    lambda p: WorkPackage.objects.get(parent_package=p, package_name=row[p.package]),
+                    lambda p: WorkPackage.objects.get(parent_package=p, package_name=row[p.package_name]),
                     parent_packages
                 )
             )

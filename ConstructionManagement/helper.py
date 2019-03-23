@@ -14,9 +14,9 @@ def batch_create_workpackages(dataframe):
         parent = dataframe.iloc[:, i].name
         children = dataframe.iloc[:, i].unique()
         # Column의 name은 대분류가 되어야 한다.
-        p, _ = WorkPackage.objects.get_or_create(package=parent, parent_package=None)
+        p, _ = WorkPackage.objects.get_or_create(package_name=parent, parent_package=None)
         result.append(p)
         # Column들의 데이터들을 돌면서 대분류를 부모로 가지는 소분류들을 생성한다.
         for c in children:
-            w, _ = WorkPackage.objects.get_or_create(parent_package=p, package=str(c))
+            w, _ = WorkPackage.objects.get_or_create(package_name=str(c), parent_package=p)
     return result
