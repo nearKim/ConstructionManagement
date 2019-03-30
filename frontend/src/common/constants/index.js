@@ -3,14 +3,10 @@ let InformationType = {
     PRODUCTIVITY: 'productivity'
 }
 
-let CsvModalType = {
+let ModalType = {
     ACTIVITY: 'activity',
-    RESOURCE: 'resource'
-}
-
-let AddModalType = {
+    RESOURCE: 'resource',
     PROJECT: 'project',
-    ACTIVITY: 'activity'
 }
 
-export {InformationType, CsvModalType, AddModalType}
+export {InformationType,ModalType}
