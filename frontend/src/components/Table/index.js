@@ -20,10 +20,17 @@ export default class Table extends Component {
     }
 
     render() {
+        const selectRowProp = {
+            mode: 'checkbox',
+            clickToSelect: true,
+            bgColor: 'grey'
+        }
+
         return (
             this.initialized ?
                 <BootstrapTable keyField={this.keyField}
                                 columns={this.columns}
+                                selectRow={this.props.selectable? selectRowProp : undefined}
                                 data={this.props.data}/>
                 : null
         );

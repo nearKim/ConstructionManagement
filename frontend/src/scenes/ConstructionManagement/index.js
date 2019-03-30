@@ -5,7 +5,7 @@ import {Button} from 'reactstrap';
 import * as api from '../../common/api'
 import Table from "../../components/Table";
 import CustomModal from "../../components/CustomModal";
-import {ModalType} from "../../common/constants";
+import {InformationType, ModalType} from "../../common/constants";
 import {convertData4BootstrapTable} from "../../common/utils";
 
 export default class ConstructionManagement extends Component {
@@ -17,9 +17,12 @@ export default class ConstructionManagement extends Component {
             modalType: '',
             projects: [],
             activities: [],
+            resources: [],
             workPackages: [],
             durationInfos: [],
-            productivityInfos: []
+            productivityInfos: [],
+            selectedActivities: [],
+            selectedInfos: []
         }
 
         this.toggleModal = this.toggleModal.bind(this)
@@ -31,6 +34,7 @@ export default class ConstructionManagement extends Component {
         Promise.all(
             [
                 api.getProjects(),
+                api.getResources(),
                 api.getActivities(),
                 api.getWorkPackages(),
                 api.getDurationInfos(),
@@ -41,10 +45,11 @@ export default class ConstructionManagement extends Component {
                 this.setState({
                     initialized: true,
                     projects: res[0],
-                    activities: res[1],
-                    workPackages: res[2],
-                    durationInfos: res[3],
-                    productivityInfos: res[4]
+                    resources: res[1],
+                    activities: res[2],
+                    workPackages: res[3],
+                    durationInfos: res[4],
+                    productivityInfos: res[5]
                 })
             }
         )
@@ -99,15 +104,20 @@ export default class ConstructionManagement extends Component {
                         <div id="activity-container" className="col-sm-5">
                             <div className="manual-btn-container">
                                 <Button outline color="secondary"
-                                        onClick={() => this.showModal(ModalType.PROJECT)}>프로젝트 추가
+                                        onClick={() => this.showModal(ModalType.PROJECT)}>Add project
                                 </Button>
                             </div>
                             <SearchBar/>
                             <WorkPackageFilter/>
                             {/* Project List */}
-                            <Table data={convertData4BootstrapTable(this.state.projects)}/>
+                            <Table selectable={false}
+                                   data={convertData4BootstrapTable(this.state.projects)}/>
+                            {/* Resource List */}
+                            <Table selectable={false}
+                                   data={convertData4BootstrapTable(this.state.resources)}/>
                             {/* Activity List */}
-                            <Table data={convertData4BootstrapTable(this.state.activities)}/>
+                            <Table selectable={true}
+                                   data={convertData4BootstrapTable(this.state.activities)}/>
                         </div>
                         <div id="other-btn-container" className="col-sm-2">
                             <Button outline
@@ -124,9 +134,11 @@ export default class ConstructionManagement extends Component {
                             <SearchBar/>
                             <WorkPackageFilter/>
                             {/* Duration List */}
-                            <Table data={this.state.durationInfos}/>
+                            <Table selectable={true}
+                                   data={this.state.durationInfos}/>
                             {/* Productivity List */}
-                            <Table data={this.state.productivityInfos}/>
+                            <Table selectable={true}
+                                   data={this.state.productivityInfos}/>
                         </div>
                     </div>
                     {/* Modals */}
