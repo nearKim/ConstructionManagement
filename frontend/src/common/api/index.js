@@ -22,6 +22,10 @@ export function createProject(projectName, projectDescription) {
     })
     return fetch(`${API_V1_ENDPOINT}/projects/`, {
         method: 'POST',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        },
         body: data
     })
 }
@@ -33,6 +37,10 @@ export function editProject(projectName, projectDescription) {
     })
     return fetch(`${API_V1_ENDPOINT}/projects/`, {
         method: 'PUT',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        },
         body: data
     })
 }
@@ -65,6 +73,10 @@ export function getActivityWorkPackages(activityId) {
 export function createActivity(createData) {
     return fetch(`${API_V1_ENDPOINT}/activities/`, {
         method: 'POST',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        },
         body: createData
     })
 }
@@ -72,6 +84,10 @@ export function createActivity(createData) {
 export function editActivity(activityId, editData) {
     return fetch(`${API_V1_ENDPOINT}/activities/${activityId}/`, {
         method: 'PUT',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        },
         body: editData
     })
 }
@@ -120,6 +136,10 @@ export function getResource(resourceId) {
 export function createResource(createData) {
     return fetch(`${API_V1_ENDPOINT}/resources/`, {
         method: 'POST',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        },
         body: createData
     })
 }
@@ -127,6 +147,10 @@ export function createResource(createData) {
 export function editResource(resourceId, editData) {
     return fetch(`${API_V1_ENDPOINT}/resources/${resourceId}/`, {
         method: 'PUT',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        },
         body: editData
     })
 }
@@ -167,6 +191,10 @@ export function createWorkPackage(packageName, parentPackage) {
 
     return fetch(`${API_V1_ENDPOINT}/work-packages/`, {
         method: 'POST',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        },
         body: createData
     })
 }
@@ -179,6 +207,10 @@ export function editWorkPackage(workPackageId, packageName, parentPackage) {
 
     return fetch(`${API_V1_ENDPOINT}/work-packages/${workPackageId}/`, {
         method: 'PUT',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        },
         body: editData
     })
 }
@@ -211,6 +243,10 @@ export function getDurationInfoActivities(dataId) {
 export function createDurationInfo(createData) {
     return fetch(`${API_V1_ENDPOINT}/duration-infos/`, {
         method: 'POST',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        },
         body: createData
     })
 }
@@ -218,6 +254,10 @@ export function createDurationInfo(createData) {
 export function editDurationInfo(dataId, editData) {
     return fetch(`${API_V1_ENDPOINT}/duration-infos/${dataId}/`, {
         method: 'PUT',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        },
         body: editData
     })
 }
@@ -250,6 +290,10 @@ export function getProductivityInfoActivities(dataId) {
 export function createProductivityInfo(createData) {
     return fetch(`${API_V1_ENDPOINT}/productivity-infos/`, {
         method: 'POST',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        },
         body: createData
     })
 }
