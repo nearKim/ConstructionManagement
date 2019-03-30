@@ -4,25 +4,26 @@ import WorkPackageFilter from '../../components/WorkPacakgeFilter'
 import {Button} from 'reactstrap';
 import * as api from '../../common/api'
 import Table from "../../components/Table";
-import CsvModal from "../../components/CsvModal";
-import {CsvModalType, AddModalType} from "../../common/constants";
+import CustomModal from "../../components/CustomModal";
+import {ModalType} from "../../common/constants";
+import {convertData4BootstrapTable} from "../../common/utils";
 
 export default class ConstructionManagement extends Component {
     constructor(props) {
         super(props)
         this.state = {
             initialized: false,
-            showCsvModal: false,
-            showAddModal: false,
-            csvModalType: '',
-            addModalType: '',
+            showModal: false,
+            modalType: '',
             projects: [],
             activities: [],
             workPackages: [],
             durationInfos: [],
             productivityInfos: []
-
         }
+
+        this.toggleModal = this.toggleModal.bind(this)
+        this.createProject = this.createProject.bind(this)
     }
 
     componentDidMount() {
@@ -35,10 +36,7 @@ export default class ConstructionManagement extends Component {
                 api.getDurationInfos(),
                 api.getProductivityInfos()
             ]
-        ).then(responses =>
-            Promise.all(
-                responses.map(res => res.json())
-            )
+        ).then(responses => Promise.all(responses.map(r => r.json()))
         ).then(res => {
                 this.setState({
                     initialized: true,
@@ -53,64 +51,76 @@ export default class ConstructionManagement extends Component {
     }
 
     // 모달을 열고 타입을 넣어준다
-    showCsvModal(csvModalType) {
+    showModal(modalType) {
         this.setState({
-            showCsvModal: true,
-            csvModalType: csvModalType
+            showModal: true,
+            modalType: modalType
         })
     }
 
+
     // 모달을 열고 닫는다
-    toggleModal(isCsvModal) {
-        isCsvModal ?
-            this.setState(prevState => ({
-                    showCsvModal: !prevState.showCsvModal
+    toggleModal() {
+        this.setState(prevState => ({
+                showModal: !prevState.showModal
+            })
+        )
+    }
+
+    // API를 통해 프로젝트를 생성하고 모달을 닫는다
+    createProject(projectName, projectDescription) {
+        api.createProject(projectName, projectDescription)
+            .then(res => res.json())
+            .then(project => {
+                this.setState({
+                    projects: [...this.state.projects, project],
+                    showModal: false
                 })
-            ) :
-            this.setState(prevState => ({
-                    showAddModal: !prevState.showAddModal
-                })
-            )
+            })
     }
 
     render() {
-        let csvModalTitle = this.state.csvModalType === CsvModalType.ACTIVITY ? 'Activity CSV Import' : 'Resource CSV Import'
-        let addModalTitle = this.state.addModalType === AddModalType.ACTIVITY ? 'Activity 수동 생성' : 'Project 수동 생성'
-
+        let modalTitle
+        switch (this.state.modalType) {
+            case ModalType.PROJECT:
+                modalTitle = 'Create Project'
+                break
+            case ModalType.RESOURCE:
+                modalTitle = 'Resource CSV import'
+                break
+            case ModalType.ACTIVITY:
+                modalTitle = 'Activity CSV import'
+                break
+        }
         return (
             this.state.initialized ?
                 <div>
                     <div className="row">
                         <div id="activity-container" className="col-sm-5">
                             <div className="manual-btn-container">
-                                <Button outline color="secondary">프로젝트 추가</Button>
-                                <Button outline color="secondary">액티비티 추가</Button>
+                                <Button outline color="secondary"
+                                        onClick={() => this.showModal(ModalType.PROJECT)}>프로젝트 추가
+                                </Button>
                             </div>
                             <SearchBar/>
                             <WorkPackageFilter/>
                             {/* Project List */}
-                            <Table data={this.state.projects}/>
+                            <Table data={convertData4BootstrapTable(this.state.projects)}/>
                             {/* Activity List */}
-                            <Table data={this.state.activities}/>
+                            <Table data={convertData4BootstrapTable(this.state.activities)}/>
                         </div>
                         <div id="other-btn-container" className="col-sm-2">
                             <Button outline
                                     color="secondary"
-                                    onClick={() => this.showCsvModal(CsvModalType.ACTIVITY)}>
-                                액티비티 일괄 추가
+                                    onClick={() => this.showModal(ModalType.ACTIVITY)}>액티비티 일괄 추가
                             </Button>
                             <Button outline
                                     color="secondary"
-                                    onClick={() => this.showCsvModal(CsvModalType.RESOURCE)}>
-                                리소스 일괄 추가
+                                    onClick={() => this.showModal(ModalType.RESOURCE)}>리소스 일괄 추가
                             </Button>
                             <Button outline color="primary">연결하기</Button>
                         </div>
                         <div id="information-container" className="col-sm-5">
-                            <div className="manual-btn-container">
-                                <Button outline color="secondary">Duration 정보 추가</Button>
-                                <Button outline color="secondary">Productivity 정보 추가</Button>
-                            </div>
                             <SearchBar/>
                             <WorkPackageFilter/>
                             {/* Duration List */}
@@ -120,10 +130,11 @@ export default class ConstructionManagement extends Component {
                         </div>
                     </div>
                     {/* Modals */}
-                    <CsvModal modalType={this.state.csvModalType}
-                              showCsvModal={this.state.showCsvModal}
-                              modalTitle={csvModalTitle}
-                              toggleModalHandler={() => this.toggleModal(true)}
+                    <CustomModal modalType={this.state.modalType}
+                                 showModal={this.state.showModal}
+                                 modalTitle={modalTitle}
+                                 createProjectHandler={this.createProject}
+                                 toggleModalHandler={this.toggleModal}
                     />
                 </div>
                 : null
