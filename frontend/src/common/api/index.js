@@ -165,7 +165,7 @@ export function importResourceCSV(csvFile) {
     let formData = new FormData()
     formData.append('file', csvFile)
 
-    return fetch(`${API_V1_ENDPOINT}/activities/csv_import/`, {
+    return fetch(`${API_V1_ENDPOINT}/resources/csv_import/`, {
         method: 'POST',
         body: formData
     })
