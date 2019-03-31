@@ -41,14 +41,14 @@ export function convertData4BootstrapTable(rawDataArr) {
     // shallow copy
     let dataArr = rawDataArr.slice()
 
-    dataArr.map(data => {
+    dataArr = dataArr.map(data => {
         // created와 updated는 빼줍시다
         delete data.created
         delete data.modified
 
         // WorPackage가 있는 경우 대,소분류 나눠서 각각 넣어준다
         if (data['work_package']) {
-            let workPackages = data.work_package
+            let workPackages = data['work_package']
             delete data.work_package
 
             data = {...data, ...aggregateWorkPackages(workPackages)}
@@ -59,6 +59,8 @@ export function convertData4BootstrapTable(rawDataArr) {
         if (data['resource']) {
             data['resource'] = data['resource']['name']
         }
+
+        return data
     })
 
     return dataArr
