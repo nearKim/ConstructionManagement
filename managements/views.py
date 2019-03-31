@@ -115,7 +115,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
             # activity의 data 정보 업데이트
             activity.data = data
             activity.save()
-            return Response('Success')
+            return Response('Success', data=data)
         else:
             # link가 존재하는 경우 기존의 DataInfo와 링크하는 것이다.
             data = get_object_or_404(DataInfo, data_id=data_id)
@@ -145,7 +145,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
 
             # 데이터 업데이트
             data.save()
-            return Response('success')
+            return Response('success', data=data)
 
     @action(detail=False, methods=['POST'])
     def csv_import(self, request):
@@ -158,7 +158,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
 
         # FIXME: name, description을 추가한 리스트로 교체하기
         # non_work_packages = ['activityID','name', 'description', 'projectID', 'duration', 'productivity', 'resourceID', 'numofLabour']
-        non_work_packages = ['activityID', 'projectID', 'duration', 'productivity', 'resourceID', 'numofLabour']
+        non_work_packages = ['activityID', 'projectID', 'duration', 'productivity', 'quantity', 'resourceID', 'numofLabour']
 
         df = pd.read_csv(io_string)
 
@@ -184,22 +184,22 @@ class ActivityViewSet(viewsets.ModelViewSet):
             )
             try:
                 # Activity를 생성하면서 대분류, 소분류를 모두 넣어준다.
-                a, _ = Activity.objects.update_or_create(
+                a, created = Activity.objects.update_or_create(
                     activity_id=row['activityID'],
                     # FIXME: name, description, quantity 대체하기
                     name='TEMP_NAME',
                     description='TEMP_DESCRIPTION',
                     duration=row['duration'],
-                    quantity=10,
-                    productivity=row['productivity'],
+                    quantity=row['quantity'],
+                    productivity=row['quantity']/row['duration'],
                     labor_cnt=row['numofLabour'],
                     project_id=row['projectID'],
                     resource_id=row['resourceID'],
                     data=None
                 )
                 a.work_package.add(*parent_packages, *child_packages)
-
-                result['success'].append(index)
+                if created:
+                    result['success'].append(index)
 
             except IntegrityError as e1:
                 status_200 = False
@@ -310,7 +310,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
             )
             try:
                 # Resource를 생성하면서 대분류, 소분류를 모두 넣어준다.
-                r, _ = Resource.objects.update_or_create(
+                r, created = Resource.objects.update_or_create(
                     # FIXME: productivity 대체하기
                     id=row['resourceID'],
                     name=row['resourceName'],
@@ -318,8 +318,8 @@ class ResourceViewSet(viewsets.ModelViewSet):
                 )
 
                 r.work_package.add(*parent_packages, *child_packages)
-
-                result['success'].append(index)
+                if created:
+                    result['success'].append(index)
 
             except IntegrityError as e1:
                 status_200 = False
