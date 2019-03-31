@@ -111,8 +111,7 @@ export function makeActivityData(activityId, dataId = '', type, link = '', descr
 export function importActivityCSV(csvFile) {
     let formData = new FormData()
     formData.append('file', csvFile)
-    console.log(formData)
-    console.log(csvFile)
+
     return fetch(`${API_V1_ENDPOINT}/activities/csv_import/`, {
         method: 'POST',
         body: formData

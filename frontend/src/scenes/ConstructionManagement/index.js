@@ -55,6 +55,8 @@ export default class ConstructionManagement extends Component {
         )
     }
 
+    /* Modal Methods */
+
     // 모달을 열고 타입을 넣어준다
     showModal(modalType) {
         this.setState({
@@ -83,6 +85,34 @@ export default class ConstructionManagement extends Component {
                 })
             })
     }
+
+    // Activity가 생성된 경우 데이터를 state에 넣어주고 모달을 닫는다
+    setActivityData(activities) {
+        if (activities.length === 0) {
+            this.setState({showModal: false})
+            return
+        }
+        this.setState(prevState => ({
+                activities: [...prevState.activities, ...activities],
+                showModal: false
+            })
+        )
+    }
+
+    // Resource가 생성된 경우 데이터를 state에 넣어주고 모달을 닫는다
+    setResourceData(resources) {
+        if (resources.length === 0) {
+            this.setState({showModal: false})
+            return
+        }
+        this.setState(prevState => ({
+                resources: [...prevState.resources, ...resources],
+                showModal: false
+            })
+        )
+    }
+
+    /* Table Methods */
 
     // 선택된 activity row정보를 state에 저장한다
     onActivityRowSelect(row, isSelected, rowIndex, e) {
@@ -204,6 +234,9 @@ export default class ConstructionManagement extends Component {
                                  showModal={this.state.showModal}
                                  modalTitle={modalTitle}
                                  createProjectHandler={this.createProject}
+                                 setStateHandler={this.state.modalType === ModalType.ACTIVITY ?
+                                     (res) => this.setActivityData(res) :
+                                     (res) => this.setResourceData(res)}
                                  toggleModalHandler={this.toggleModal}
                     />
                 </div>

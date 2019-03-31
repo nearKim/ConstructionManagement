@@ -36,11 +36,11 @@ export default class CustomModal extends Component {
         if (this.props.modalType === ModalType.ACTIVITY) {
             api.importActivityCSV(this.state.csvFile)
                 .then(res => res.json())
-                .then(res => console.log(res))
+                .then(res => this.props.setStateHandler(JSON.parse(res['success'])))
         } else if (this.props.modalType === ModalType.RESOURCE) {
             api.importResourceCSV(this.state.csvFile)
                 .then(res => res.json())
-                .then(res => console.log(res))
+                .then(res => this.props.setStateHandler(JSON.parse(res['success'])))
         }
 
     }
