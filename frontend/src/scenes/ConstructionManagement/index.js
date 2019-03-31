@@ -84,6 +84,49 @@ export default class ConstructionManagement extends Component {
             })
     }
 
+    // 선택된 activity row정보를 state에 저장한다
+    onActivityRowSelect(row, isSelected, rowIndex, e) {
+        this.setState(prevState => ({
+            selectedActivities: [...prevState.selectedActivities, row]
+        }))
+    }
+
+    // 선택된 Information row 정보를 state에 저장한다
+    onInformationRowSelect(row, isSelected, rowIndex, e) {
+        this.setState(prevState => ({
+            selectedInfos: [...prevState.selectedInfos, row]
+        }))
+    }
+
+    // 1개의 선택된 activity를 사용하여 Duration 혹은 Productivity Information을 생성한다
+    createInfo(type) {
+        // 단일 information 생성인 경우 activity는 무조건 1개다
+        if (this.state.selectedActivities.length !== 1) {
+            alert('Activity는 반드시 1개가 선택되어야 합니다.')
+            return
+        }
+
+        let activity = this.state.selectedActivities[0]
+        api.makeActivityData(activity['activity_id'], undefined, type, false, activity['description'])
+            .then(res => res.json())
+            .then(res => {
+                // 잘 생성된 경우 activity selection을 초기화하고 durationInfo를 업데이트 한다.
+                if (res.statusCode === 200) {
+                    this.setState(prevState => ({
+                            selectedActivities: [],
+                            durationInfos: type === InformationType.DURATION ? [...prevState.durationInfos, res] : prevState.durationInfos,
+                            productivityInfos: type === InformationType.PRODUCTIVITY ? [...prevState.productivityInfos, res] : prevState.productivityInfos
+                        })
+                    )
+                } else {
+                    // 뭔가 문제가 있으면 그냥 결과를 보여주고 refresh 한다
+                    alert(res)
+                    location.reload()
+                }
+            })
+    }
+
+
     render() {
         let modalTitle
         switch (this.state.modalType) {
@@ -101,44 +144,59 @@ export default class ConstructionManagement extends Component {
             this.state.initialized ?
                 <div>
                     <div className="row">
-                        <div id="activity-container" className="col-sm-5">
-                            <div className="manual-btn-container">
-                                <Button outline color="secondary"
-                                        onClick={() => this.showModal(ModalType.PROJECT)}>Add project
-                                </Button>
-                            </div>
-                            <SearchBar/>
-                            <WorkPackageFilter/>
+                        <div className="col-sm-4">
+                            <Button outline color="secondary"
+                                    onClick={() => this.showModal(ModalType.PROJECT)}>Add project</Button>
                             {/* Project List */}
                             <Table selectable={false}
                                    data={convertData4BootstrapTable(this.state.projects)}/>
+                        </div>
+                        <div className="col-sm-8">
+                            <Button outline
+                                    color="secondary"
+                                    onClick={() => this.showModal(ModalType.RESOURCE)}>Import resources
+                            </Button>
                             {/* Resource List */}
                             <Table selectable={false}
                                    data={convertData4BootstrapTable(this.state.resources)}/>
-                            {/* Activity List */}
-                            <Table selectable={true}
-                                   data={convertData4BootstrapTable(this.state.activities)}/>
                         </div>
-                        <div id="other-btn-container" className="col-sm-2">
+                    </div>
+                    <div className="row">
+                        <div id="activity-container" className="col-sm-12">
                             <Button outline
                                     color="secondary"
-                                    onClick={() => this.showModal(ModalType.ACTIVITY)}>액티비티 일괄 추가
+                                    onClick={() => this.showModal(ModalType.ACTIVITY)}>Import activities
                             </Button>
-                            <Button outline
-                                    color="secondary"
-                                    onClick={() => this.showModal(ModalType.RESOURCE)}>리소스 일괄 추가
-                            </Button>
-                            <Button outline color="primary">연결하기</Button>
-                        </div>
-                        <div id="information-container" className="col-sm-5">
                             <SearchBar/>
                             <WorkPackageFilter/>
-                            {/* Duration List */}
+                            {/* Activity List */}
                             <Table selectable={true}
-                                   data={this.state.durationInfos}/>
-                            {/* Productivity List */}
-                            <Table selectable={true}
-                                   data={this.state.productivityInfos}/>
+                                   rowSelectHandler={() => this.onActivityRowSelect()}
+                                   data={convertData4BootstrapTable(this.state.activities)}/>
+                        </div>
+                        <div className="row">
+                            <div id="other-btn-container" className="col-sm-12">
+                                <Button outline color="primary">Link activity</Button>
+                                <Button outline color="primary"
+                                        onClick={() => this.createInfo(InformationType.DURATION)}>Use duration</Button>
+                                <Button outline color="primary"
+                                        onClick={() => this.createInfo(InformationType.PRODUCTIVITY)}>Use
+                                    productivity</Button>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div id="information-container" className="col-sm-12">
+                                <SearchBar/>
+                                <WorkPackageFilter/>
+                                {/* Duration List */}
+                                <Table selectable={true}
+                                       rowSelectHandler={() => this.onInformationRowSelect()}
+                                       data={this.state.durationInfos}/>
+                                {/* Productivity List */}
+                                <Table selectable={true}
+                                       rowSelectHandler={() => this.onInformationRowSelect()}
+                                       data={this.state.productivityInfos}/>
+                            </div>
                         </div>
                     </div>
                     {/* Modals */}

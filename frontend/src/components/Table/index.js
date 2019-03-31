@@ -22,8 +22,10 @@ export default class Table extends Component {
     render() {
         const selectRowProp = {
             mode: 'checkbox',
+            sort: true,
             clickToSelect: true,
-            bgColor: 'grey'
+            bgColor: 'grey',
+            onSelect: this.props.rowSelectHandler
         }
 
         return (
