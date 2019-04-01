@@ -66,3 +66,8 @@ export function convertData4BootstrapTable(rawDataArr) {
     return dataArr
 }
 
+export function pop(obj, key) {
+    let entry = obj[key]
+    delete obj[key]
+    return entry
+}

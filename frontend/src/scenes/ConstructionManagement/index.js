@@ -6,7 +6,7 @@ import * as api from '../../common/api'
 import Table from "../../components/Table";
 import CustomModal from "../../components/CustomModal";
 import {InformationType, ModalType} from "../../common/constants";
-import {convertData4BootstrapTable} from "../../common/utils";
+import {convertData4BootstrapTable, pop} from "../../common/utils";
 
 export default class ConstructionManagement extends Component {
     constructor(props) {
@@ -88,12 +88,15 @@ export default class ConstructionManagement extends Component {
 
     // Activity가 생성된 경우 데이터를 state에 넣어주고 모달을 닫는다
     setActivityData(activities) {
-        if (activities.length === 0) {
-            this.setState({showModal: false})
-            return
-        }
+        Object.keys(activities).map((key, index) => {
+            activities[key] = JSON.parse(activities[key])
+        })
+        let success = pop(activities, 'success')
+
+        // 에러 상황을 한번 보여준다.
+        alert('결과를 확인해주세요. \n' + JSON.stringify(activities))
         this.setState(prevState => ({
-                activities: [...prevState.activities, ...activities],
+                activities: [...prevState.activities, ...success],
                 showModal: false
             })
         )
@@ -101,12 +104,16 @@ export default class ConstructionManagement extends Component {
 
     // Resource가 생성된 경우 데이터를 state에 넣어주고 모달을 닫는다
     setResourceData(resources) {
-        if (resources.length === 0) {
-            this.setState({showModal: false})
-            return
-        }
+        Object.keys(resources).map((key, index) => {
+            resources[key] = JSON.parse(resources[key])
+        })
+        let success = pop(resources, 'success')
+
+        // 에러 상황을 한번 보여준다.
+        alert('결과를 확인해주세요. \n' + JSON.stringify(resources))
+
         this.setState(prevState => ({
-                resources: [...prevState.resources, ...resources],
+                resources: [...prevState.resources, ...success],
                 showModal: false
             })
         )

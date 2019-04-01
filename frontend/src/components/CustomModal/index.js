@@ -32,15 +32,14 @@ export default class CustomModal extends Component {
     onCsvSubmit() {
         if (!this.state.csvFile) alert('파일이 없습니다.')
 
-        // TODO: res를 state로 넣기
         if (this.props.modalType === ModalType.ACTIVITY) {
             api.importActivityCSV(this.state.csvFile)
                 .then(res => res.json())
-                .then(res => this.props.setStateHandler(JSON.parse(res['success'])))
+                .then(res => this.props.setStateHandler(res))
         } else if (this.props.modalType === ModalType.RESOURCE) {
             api.importResourceCSV(this.state.csvFile)
                 .then(res => res.json())
-                .then(res => this.props.setStateHandler(JSON.parse(res['success'])))
+                .then(res => this.props.setStateHandler(res))
         }
 
     }
