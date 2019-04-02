@@ -1,6 +1,3 @@
-import enum
-
-
-class InfoType(enum.Enum):
+class InfoType:
     DURATION = 'duration'
     PRODUCTIVITY = 'productivity'
