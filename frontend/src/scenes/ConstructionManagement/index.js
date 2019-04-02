@@ -123,16 +123,35 @@ export default class ConstructionManagement extends Component {
 
     // 선택된 activity row정보를 state에 저장한다
     onActivityRowSelect(row, isSelected, rowIndex, e) {
-        this.setState(prevState => ({
-            selectedActivities: [...prevState.selectedActivities, row]
-        }))
+        let deleteFlag = this.state.selectedActivities
+            .map(a => a['activity_id'])
+            .includes(row['activity_id'])
+        console.log(row)
+        // 만일 현재 row가 state에 존재하면 지워주고 아니면 넣어준다
+        deleteFlag ?
+            this.setState(prevState => ({
+                selectedActivities: prevState.selectedActivities.filter(a => a['activity_id'] !== row['activity_id'])
+            })) :
+            this.setState(prevState => ({
+                selectedActivities: [...prevState.selectedActivities, row]
+            }))
     }
 
     // 선택된 Information row 정보를 state에 저장한다
     onInformationRowSelect(row, isSelected, rowIndex, e) {
-        this.setState(prevState => ({
-            selectedInfos: [...prevState.selectedInfos, row]
-        }))
+        let deleteFlag = this.state.selectedInfos
+            .map(i => i['data_id'])
+            .includes(row['data_id'])
+
+        // 만일 현재 row가 state에 존재하면 지워주고 아니면 넣어준다
+        deleteFlag ?
+            this.setState(prevState => ({
+                selectedActivities: prevState.selectedInfos.filter(i => i['data_id'] !== row['data_id'])
+
+            })) :
+            this.setState(prevState => ({
+                selectedInfos: [...prevState.selectedInfos, row]
+            }))
     }
 
     // 1개의 선택된 activity를 사용하여 Duration 혹은 Productivity Information을 생성한다
@@ -208,7 +227,7 @@ export default class ConstructionManagement extends Component {
                             <WorkPackageFilter/>
                             {/* Activity List */}
                             <Table selectable={true}
-                                   rowSelectHandler={() => this.onActivityRowSelect()}
+                                   rowSelectHandler={(row, isSelected, rowIndex, e) => this.onActivityRowSelect(row, isSelected, rowIndex, e)}
                                    data={convertData4BootstrapTable(this.state.activities)}/>
                         </div>
                         <div className="row">
@@ -228,11 +247,11 @@ export default class ConstructionManagement extends Component {
                                 {/* Duration List */}
                                 <Table selectable={true}
                                        rowSelectHandler={() => this.onInformationRowSelect()}
-                                       data={this.state.durationInfos}/>
+                                       data={convertData4BootstrapTable(this.state.durationInfos)}/>
                                 {/* Productivity List */}
                                 <Table selectable={true}
                                        rowSelectHandler={() => this.onInformationRowSelect()}
-                                       data={this.state.productivityInfos}/>
+                                       data={convertData4BootstrapTable(this.state.productivityInfos)}/>
                             </div>
                         </div>
                     </div>
