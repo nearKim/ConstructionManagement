@@ -100,11 +100,13 @@ export function deleteActivity(activityId) {
 
 export function makeActivityData(activityId, dataId = '', type, link = '', description = '') {
     let query = `?type=${type}&link=${link}`
-    return fetch(`${API_V1_ENDPOINT}/activities/${activityId}/information/${dataId}/` + query, {
+    return fetch(`${API_V1_ENDPOINT}/activities/${activityId}/information/${dataId}` + query, {
         method: 'POST',
-        body: {
-            description: description
-        }
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({description: description})
     })
 }
 
