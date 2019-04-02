@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_207_MULTI_STATUS, HTTP_400_BAD_REQUEST
 
 from ConstructionManagement.constants import InfoType
-from ConstructionManagement.helper import batch_create_workpackages
+from ConstructionManagement.helper import batch_create_workpackages, generate_data_id
 from informations.models import DurationInfo, ProductivityInfo
 from managements.models import *
 from managements.serializers import (
@@ -82,6 +82,9 @@ class ActivityViewSet(viewsets.ModelViewSet):
         value_type = request.query_params.get('type', None)
         description = request.data.get('description', '')
 
+        # DataInfo의 ID를 지정한다
+        id_root = generate_data_id(work_packages) + str(DataInfo.objects.count())
+
         # link가 없거나 false인 경우 새로 DataInfo를 생성하는 것이다.
         if not link:
             # type이 없으면 400을 띄운다.
@@ -90,7 +93,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
             if value_type == InfoType.PRODUCTIVITY:
                 # type이 productivity라면 ProductivityInfo를 생성한다.
                 data = ProductivityInfo.objects.create(
-                    data_id=data_id,
+                    data_id='p.' + id_root,
                     data_cnt=1,
                     mean=activity.productivity,
                     maximum=activity.productivity,
@@ -101,7 +104,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
             elif value_type == InfoType.DURATION:
                 # type이 duration이라면 DurationInfo를 생성한다.
                 data = DurationInfo.objects.create(
-                    data_id=data_id,
+                    data_id='d.' + id_root,
                     data_cnt=1,
                     mean=activity.duration,
                     maximum=activity.duration,

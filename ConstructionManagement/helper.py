@@ -22,3 +22,15 @@ def batch_create_workpackages(dataframe):
                 continue
             w, _ = WorkPackage.objects.get_or_create(package_name=str(c), parent_package=p)
     return result
+
+
+def generate_data_id(work_packages):
+    """
+    Work Package들을 받아서 child package들의 name을 이어붙여서 data_id를 만들어 반환한다
+    :param work_packages: WorkPackage들의 QuerySet
+    :return: data_id
+    """
+    data_id = ''
+    for work_package in work_packages.exclude(parent_package__isnull=True):
+        data_id += work_package.package_name + '.'
+    return data_id
