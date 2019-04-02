@@ -18,5 +18,7 @@ def batch_create_workpackages(dataframe):
         result.append(p)
         # Column들의 데이터들을 돌면서 대분류를 부모로 가지는 소분류들을 생성한다.
         for c in children:
+            if pd.isna(c):
+                continue
             w, _ = WorkPackage.objects.get_or_create(package_name=str(c), parent_package=p)
     return result

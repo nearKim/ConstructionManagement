@@ -175,10 +175,12 @@ class ActivityViewSet(viewsets.ModelViewSet):
         status_200 = True
 
         for index, row in df.iterrows():
-            # 지금 iteration 돌고있는 row에 해당하는 소분류 Work Package 리스트를 모은다.
+            # 지금 iteration 돌고있는 row에 해당하는 소분류 Work Package 리스트를 모은다. 이 때 nan이라면 무시한다.
             child_packages = list(
                 map(
-                    lambda p: WorkPackage.objects.get(parent_package=p, package_name=row[p.package_name]),
+                    lambda p: WorkPackage.objects.get(parent_package=p,
+                                                      package_name=row[p.package_name]) if not pd.isna(
+                        row[p.package_name]) else None,
                     parent_packages
                 )
             )
