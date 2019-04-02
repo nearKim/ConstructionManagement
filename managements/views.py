@@ -6,7 +6,7 @@ import pandas as pd
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, detail_route
 from rest_framework.response import Response
 from rest_framework.status import HTTP_207_MULTI_STATUS, HTTP_400_BAD_REQUEST
 
@@ -71,7 +71,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
         serializer = WorkPackageSerializer(work_packages, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['POST'], url_path='informations/(?P<data_id>[a-zA-Z0-9_]+)')
+    @action(detail=True, methods=['POST'], url_path='information(?:/(?P<data_id>[a-zA-Z0-9_]+))?')
     def information(self, request, pk=None, data_id=None):
         # Activity와 activity가 가지고 있는 work package들을 불러온다
         activity = self.get_object()
@@ -115,7 +115,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
             # activity의 data 정보 업데이트
             activity.data = data
             activity.save()
-            return Response('Success', data=data)
+            return Response('Success')
         else:
             # link가 존재하는 경우 기존의 DataInfo와 링크하는 것이다.
             data = get_object_or_404(DataInfo, data_id=data_id)
@@ -145,7 +145,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
 
             # 데이터 업데이트
             data.save()
-            return Response('success', data=data)
+            return Response('success')
 
     @action(detail=False, methods=['POST'])
     def csv_import(self, request):
