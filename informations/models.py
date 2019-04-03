@@ -15,6 +15,16 @@ class DataInfo(TimeStampedMixin):
     description = models.TextField(_('설명'), blank=True)
     work_package = models.ManyToManyField('managements.WorkPackage', related_name='durations')
 
+    def cast(self):
+        for name in dir(self):
+            try:
+                attr = getattr(self, name)
+                if isinstance(attr, self.__class__):
+                    return attr
+            except:
+                pass
+        return self
+
 
 class DurationInfo(DataInfo):
     pass

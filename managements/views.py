@@ -8,11 +8,12 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, detail_route
 from rest_framework.response import Response
-from rest_framework.status import HTTP_207_MULTI_STATUS, HTTP_400_BAD_REQUEST
+from rest_framework.status import HTTP_207_MULTI_STATUS, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 
 from ConstructionManagement.constants import InfoType
 from ConstructionManagement.helper import batch_create_workpackages, generate_data_id
 from informations.models import DurationInfo, ProductivityInfo
+from informations.serializers import ProductivityInfoSerializer, DurationInfoSerializer
 from managements.models import *
 from managements.serializers import (
     ProjectBaseSerializer,
@@ -101,6 +102,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
                     use_duration=False,
                     description=description
                 )
+                serializer = ProductivityInfoSerializer(data)
             elif value_type == InfoType.DURATION:
                 # type이 duration이라면 DurationInfo를 생성한다.
                 data = DurationInfo.objects.create(
@@ -112,13 +114,14 @@ class ActivityViewSet(viewsets.ModelViewSet):
                     use_duration=True,
                     description=description
                 )
+                serializer = DurationInfoSerializer(data)
             # work_package 등록
             data.work_package.add(*work_packages)
 
             # activity의 data 정보 업데이트
             activity.data = data
             activity.save()
-            return Response('Success')
+            return Response(serializer.data)
         else:
             # link가 존재하는 경우 기존의 DataInfo와 링크하는 것이다.
             data = get_object_or_404(DataInfo, data_id=data_id)
@@ -148,7 +151,17 @@ class ActivityViewSet(viewsets.ModelViewSet):
 
             # 데이터 업데이트
             data.save()
-            return Response('success')
+
+            # 리스폰스로 던져주기 위한 데이터 serialization
+            if isinstance(data.cast(), DurationInfo):
+                serializer = DurationInfoSerializer(data)
+            elif isinstance(data.cast(), ProductivityInfo):
+                serializer = ProductivityInfoSerializer(data)
+            else:
+                # Dangling BaseClass...
+                return Response(data={'error': 'No superclass for input data found. Check your DB data.'},
+                                status=status.HTTP_404_NOT_FOUND)
+            return Response(serializer.data)
 
     @action(detail=False, methods=['POST'])
     def csv_import(self, request):
