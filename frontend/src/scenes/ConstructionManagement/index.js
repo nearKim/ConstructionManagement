@@ -65,7 +65,6 @@ export default class ConstructionManagement extends Component {
         })
     }
 
-
     // 모달을 열고 닫는다
     toggleModal() {
         this.setState(prevState => ({
@@ -126,7 +125,6 @@ export default class ConstructionManagement extends Component {
         let deleteFlag = this.state.selectedActivities
             .map(a => a['activity_id'])
             .includes(row['activity_id'])
-        console.log(row)
         // 만일 현재 row가 state에 존재하면 지워주고 아니면 넣어준다
         deleteFlag ?
             this.setState(prevState => ({
@@ -142,7 +140,6 @@ export default class ConstructionManagement extends Component {
         let deleteFlag = this.state.selectedInfos
             .map(i => i['data_id'])
             .includes(row['data_id'])
-
         // 만일 현재 row가 state에 존재하면 지워주고 아니면 넣어준다
         deleteFlag ?
             this.setState(prevState => ({
@@ -164,24 +161,88 @@ export default class ConstructionManagement extends Component {
 
         let activity = this.state.selectedActivities[0]
         api.makeActivityData(activity['activity_id'], undefined, type, false, activity['description'])
-            .then(res => res.json())
             .then(res => {
                 // 잘 생성된 경우 activity selection을 초기화하고 durationInfo를 업데이트 한다.
-                if (res.statusCode === 200) {
-                    this.setState(prevState => ({
-                            selectedActivities: [],
-                            durationInfos: type === InformationType.DURATION ? [...prevState.durationInfos, res] : prevState.durationInfos,
-                            productivityInfos: type === InformationType.PRODUCTIVITY ? [...prevState.productivityInfos, res] : prevState.productivityInfos
-                        })
-                    )
+                if (res.status === 200) {
+                    return res.json()
                 } else {
                     // 뭔가 문제가 있으면 그냥 결과를 보여주고 refresh 한다
-                    alert(res)
+                    alert(res.status)
                     location.reload()
                 }
             })
+            .then(res => {
+                api.getActivities()
+                    .then(res => res.json())
+                    .then(activities => this.setState(prevState => ({
+                            selectedActivities: [],
+                            activities: activities,
+                            durationInfos: type === InformationType.DURATION ? [...prevState.durationInfos, res] : prevState.durationInfos,
+                            productivityInfos: type === InformationType.PRODUCTIVITY ? [...prevState.productivityInfos, res] : prevState.productivityInfos
+                        }))
+                    )
+            })
     }
 
+    // 1개 이상의 activity를 기존의 information과 링크시킨다
+    linkInfo() {
+        // 갯수 예외처리
+        if (this.state.selectedInfos.length !== 1) {
+            alert('Information은 반드시 1개가 선택되어야 합니다.')
+            return
+        }
+        if (this.state.selectedActivities.length === 0) {
+            alert('적어도 1개의 Activity를 지정하세요.')
+            return
+        }
+
+        let dataInfo = this.state.selectedInfos[0]
+        let activityIds = this.state.selectedActivities.map(a => a['activity_id'])
+
+        // link 시키고 activity는 빼주고 info는 업데이트 해준다
+        dataInfo.use_duration ?
+            api.linkActivitiesWithDuration(dataInfo['data_id'], activityIds)
+                .then(res => {
+                    if (res.status === 200) {
+                        return res.json()
+                    } else {
+                        alert(res.status)
+                        // location.reload()
+                    }
+                })
+                .then(res => Promise.all([api.getDurationInfos(), api.getActivities()])
+                    .then(res => Promise.all(res.map(r => r.json())))
+                    .then(responses => {
+                        this.setState(prevState => ({
+                            selectedActivities: [],
+                            selectedInfos: [],
+                            durationInfos: responses[0],
+                            activities: responses[1]
+                        }))
+                    })
+                )
+            :
+            api.linkActivitiesWithProductivity(dataInfo['data_id'], activityIds)
+                .then(res => {
+                    if (res.stats === 200) {
+                        return res.json()
+                    } else {
+                        alert(res.status)
+                        // location.reload()
+                    }
+                })
+                .then(res => Promise.all([api.getProductivityInfo(), api.getActivities()])
+                    .then(res => Promise.all(res.map(r => r.json())))
+                    .then(responses => {
+                        this.setState(prevState => ({
+                            selectedActivities: [],
+                            selectedInfos: [],
+                            productivityInfos: responses[0],
+                            activities: responses[1]
+                        }))
+                    })
+                )
+    }
 
     render() {
         let modalTitle
@@ -232,7 +293,7 @@ export default class ConstructionManagement extends Component {
                         </div>
                         <div className="row">
                             <div id="other-btn-container" className="col-sm-12">
-                                <Button outline color="primary">Link activity</Button>
+                                <Button outline color="primary" onClick={() => this.linkInfo()}>Link activity</Button>
                                 <Button outline color="primary"
                                         onClick={() => this.createInfo(InformationType.DURATION)}>Use duration</Button>
                                 <Button outline color="primary"
@@ -246,11 +307,11 @@ export default class ConstructionManagement extends Component {
                                 <WorkPackageFilter/>
                                 {/* Duration List */}
                                 <Table selectable={true}
-                                       rowSelectHandler={() => this.onInformationRowSelect()}
+                                       rowSelectHandler={(row, isSelected, rowIndex, e) => this.onInformationRowSelect(row, isSelected, rowIndex, e)}
                                        data={convertData4BootstrapTable(this.state.durationInfos)}/>
                                 {/* Productivity List */}
                                 <Table selectable={true}
-                                       rowSelectHandler={() => this.onInformationRowSelect()}
+                                       rowSelectHandler={(row, isSelected, rowIndex, e) => this.onInformationRowSelect(row, isSelected, rowIndex, e)}
                                        data={convertData4BootstrapTable(this.state.productivityInfos)}/>
                             </div>
                         </div>
