@@ -37,11 +37,12 @@ export function aggregateWorkPackages(workPackages) {
  * {parent_package_name: child_package_name } 형식으로 반환해야 한다
  * @param data: api로 부터 받아온 데이터들
  */
-export function convertData4BootstrapTable(rawDataArr) {
-    // shallow copy
-    let dataArr = rawDataArr.slice()
+export function convertData4BootstrapTable(dataArr) {
 
-    dataArr = dataArr.map(data => {
+    dataArr = dataArr.map(rawData => {
+        // Shallow copy
+        let data = JSON.parse(JSON.stringify(rawData))
+
         // created와 updated는 빼줍시다
         delete data.created
         delete data.modified
