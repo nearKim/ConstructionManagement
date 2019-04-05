@@ -26,6 +26,7 @@ export default class Table extends Component {
             initialized ?
                 <BootstrapTable keyField={keyField}
                                 columns={columns}
+                                classes="table-responsive"
                                 selectRow={this.props.selectable ? selectRowProp : undefined}
                                 data={this.props.data}/>
                 : null
