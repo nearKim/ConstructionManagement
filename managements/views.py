@@ -94,7 +94,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
             if value_type == InfoType.PRODUCTIVITY:
                 # type이 productivity라면 ProductivityInfo를 생성한다.
                 data = ProductivityInfo.objects.create(
-                    data_id='p.' + id_root,
+                    data_id='p-' + id_root,
                     data_cnt=1,
                     mean=activity.productivity,
                     maximum=activity.productivity,
@@ -106,7 +106,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
             elif value_type == InfoType.DURATION:
                 # type이 duration이라면 DurationInfo를 생성한다.
                 data = DurationInfo.objects.create(
-                    data_id='d.' + id_root,
+                    data_id='d-' + id_root,
                     data_cnt=1,
                     mean=activity.duration,
                     maximum=activity.duration,

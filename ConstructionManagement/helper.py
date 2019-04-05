@@ -28,9 +28,9 @@ def generate_data_id(work_packages):
     """
     Work Package들을 받아서 child package들의 name을 이어붙여서 data_id를 만들어 반환한다
     :param work_packages: WorkPackage들의 QuerySet
-    :return: data_id
+    :return: data_id_root
     """
-    data_id = ''
+    data_id_root = ''
     for work_package in work_packages.exclude(parent_package__isnull=True):
-        data_id += work_package.package_name + '.'
-    return data_id
+        data_id_root += work_package.package_name.replace('.', '') + '-'
+    return data_id_root
