@@ -1,9 +1,12 @@
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 from informations.models import DurationInfo, ProductivityInfo
+from managements.serializers import WorkPackageSerializer
 
 
 class DurationInfoSerializer(serializers.ModelSerializer):
+    work_package = WorkPackageSerializer(many=True, read_only=True)
+
     class Meta:
         model = DurationInfo
         fields = '__all__'
@@ -15,6 +18,8 @@ class DurationInfoSerializer(serializers.ModelSerializer):
 
 
 class ProductivityInfoSerializer(serializers.ModelSerializer):
+    work_package = WorkPackageSerializer(many=True, read_only=True)
+
     class Meta:
         model = ProductivityInfo
         fields = '__all__'
