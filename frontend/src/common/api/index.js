@@ -110,6 +110,35 @@ export function makeActivityData(activityId, dataId = '', type, link = '', descr
     })
 }
 
+export function linkActivitiesWithDuration(dataId, activityIds) {
+    let linkData = {
+        activities: activityIds
+    }
+    return fetch(`${API_V1_ENDPOINT}/duration-infos/${dataId}/activities/`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(linkData)
+    })
+}
+
+export function linkActivitiesWithProductivity(dataId, activityIds) {
+    let linkData = {
+        activities: activityIds
+    }
+    return fetch(`${API_V1_ENDPOINT}/productivity-infos/${dataId}/activities/`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(linkData)
+    })
+}
+
+
 export function importActivityCSV(csvFile) {
     let formData = new FormData()
     formData.append('file', csvFile)

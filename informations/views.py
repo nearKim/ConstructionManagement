@@ -1,9 +1,13 @@
+from django.db.models import Sum, Max, Min
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from informations.models import DurationInfo, ProductivityInfo
 from informations.serializers import DurationInfoSerializer, ProductivityInfoSerializer
+from managements.models import Activity
+from managements.serializers import ActivityRetrieveListSerializer
 
 
 class DurationInfoViewSet(viewsets.ModelViewSet):
@@ -21,6 +25,40 @@ class DurationInfoViewSet(viewsets.ModelViewSet):
             return queryset.filter(work_package__in=work_packages)
         return queryset
 
+    @action(detail=True, methods=['GET', 'POST'])
+    def activities(self, request, pk=None):
+        if request.method == 'GET':
+            # GET으로 요청시 현재 duration info를 생성한 activity들을 반환한다.
+            information = self.get_object()
+            activities = Activity.objects.filter(data=information)
+            serializer = ActivityRetrieveListSerializer(activities, many=True)
+            return Response(serializer.data)
+
+        elif request.method == 'POST':
+            # 현재 data와 링크시킬 activity들의 id들을 가져온다
+            activity_ids = request.data.get('activities', None)
+            data = self.get_object().datainfo_ptr
+
+            activities = Activity.objects.filter(activity_id__in=activity_ids)
+
+            # 현재 들어온 Activity의 data info를 업데이트
+            activities.update(data=data)
+
+            # 현재 들어온 Activity의 duration 값의 기초 통계량을 구한다
+            stat = activities.aggregate(Sum('duration'), Max('duration'), Min('duration'))
+
+            # data 통계량 업데이트
+            data.mean = round((data.mean * data.data_cnt + stat['duration__sum']) / \
+                              (data.data_cnt + len(activity_ids)), 2)
+            data.maximum = max(stat['duration__max'], data.maximum)
+            data.minimum = min(stat['duration__min'], data.minimum)
+            data.data_cnt = data.data_cnt + len(activity_ids)
+            data.save()
+
+            # Response로 던져줍시다
+            serializer = DurationInfoSerializer(data)
+            return Response(serializer.data)
+
 
 class ProductivityInfoViewSet(viewsets.ModelViewSet):
     serializer_class = ProductivityInfoSerializer
@@ -36,3 +74,37 @@ class ProductivityInfoViewSet(viewsets.ModelViewSet):
             work_packages = [query_string] if not isinstance(query_string, list) else query_string
             return queryset.filter(work_package__in=work_packages)
         return queryset
+
+    @action(detail=True, methods=['GET', 'POST'])
+    def activities(self, request, pk=None):
+        if request.method == 'GET':
+            # GET으로 요청시 현재 duration info를 생성한 activity들을 반환한다.
+            information = self.get_object()
+            activities = Activity.objects.filter(data=information)
+            serializer = ActivityRetrieveListSerializer(activities, many=True)
+            return Response(serializer.data)
+
+        elif request.method == 'POST':
+            # 현재 data와 링크시킬 activity들의 id들을 가져온다
+            activity_ids = request.data.get('activities', None)
+            data = self.get_object().datainfo_ptr
+
+            activities = Activity.objects.filter(activity_id__in=activity_ids)
+
+            # 현재 들어온 Activity의 data info를 업데이트
+            activities.update(data=data)
+
+            # 현재 들어온 Activity의 duration 값의 기초 통계량을 구한다
+            stat = activities.aggregate(Sum('duration'), Max('duration'), Min('duration'))
+
+            # data 통계량 업데이트
+            data.mean = round((data.mean * data.data_cnt + stat['duration__sum']) / \
+                              (data.data_cnt + len(activity_ids)), 2)
+            data.maximum = max(stat['duration__max'], data.maximum)
+            data.minimum = min(stat['duration__min'], data.minimum)
+            data.data_cnt = data.data_cnt + len(activity_ids)
+            data.save()
+
+            # Response로 던져줍시다
+            serializer = ProductivityInfoSerializer(data)
+            return Response(serializer.data)
