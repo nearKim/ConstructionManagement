@@ -86,7 +86,8 @@ export default class ConstructionManagement extends Component {
             })
     }
 
-    // Activity가 생성된 경우 데이터를 state에 넣어주고 모달을 닫는다
+    // Activity가 생성된 경우 결과를 보여주고 새로고침한다.
+    // FIXME: csv_import가 던지는 attribute와 get activity가 던지는 attribute가 다르다.
     setActivityData(activities) {
         Object.keys(activities).map((key, index) => {
             activities[key] = JSON.parse(activities[key])
@@ -95,11 +96,7 @@ export default class ConstructionManagement extends Component {
 
         // 에러 상황을 한번 보여준다.
         alert('결과를 확인해주세요. \n' + JSON.stringify(activities))
-        this.setState(prevState => ({
-                activities: [...prevState.activities, ...success],
-                showModal: false
-            })
-        )
+        location.reload()
     }
 
     // Resource가 생성된 경우 데이터를 state에 넣어주고 모달을 닫는다
@@ -186,6 +183,7 @@ export default class ConstructionManagement extends Component {
     }
 
     // 1개 이상의 activity를 기존의 information과 링크시킨다
+    // TODO: Link하려는 Work package들이 다르면 에러를 발생시킨다
     linkInfo() {
         // 갯수 예외처리
         if (this.state.selectedInfos.length !== 1) {
@@ -225,14 +223,14 @@ export default class ConstructionManagement extends Component {
             :
             api.linkActivitiesWithProductivity(dataInfo['data_id'], activityIds)
                 .then(res => {
-                    if (res.stats === 200) {
+                    if (res.status === 200) {
                         return res.json()
                     } else {
                         alert(res.status)
                         // location.reload()
                     }
                 })
-                .then(res => Promise.all([api.getProductivityInfo(), api.getActivities()])
+                .then(res => Promise.all([api.getProductivityInfos(), api.getActivities()])
                     .then(res => Promise.all(res.map(r => r.json())))
                     .then(responses => {
                         this.setState(prevState => ({
