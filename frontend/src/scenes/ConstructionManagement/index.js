@@ -283,8 +283,6 @@ export default class ConstructionManagement extends Component {
                                     color="secondary"
                                     onClick={() => this.showModal(ModalType.ACTIVITY)}>Import activities
                             </Button>
-                            <SearchBar/>
-                            <WorkPackageFilter/>
                             {/* Activity List */}
                             <Table selectable={true}
                                    filter={textFilter({placeholder: ' '})}
@@ -303,8 +301,6 @@ export default class ConstructionManagement extends Component {
                         </div>
                         <div className="row">
                             <div id="information-container" className="col-sm-12">
-                                <SearchBar/>
-                                <WorkPackageFilter/>
                                 {/* Duration List */}
                                 <Table selectable={true}
                                        filter={textFilter({placeholder: ' '})}
