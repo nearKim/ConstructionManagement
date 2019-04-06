@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
-import BootstrapTable from 'react-bootstrap-table-next';
+import BootstrapTable from 'react-bootstrap-table-next'
+import filterFactory, {textFilter} from 'react-bootstrap-table2-filter'
 
 export default class Table extends Component {
 
@@ -8,7 +9,7 @@ export default class Table extends Component {
         let keys, columns, keyField
         if (initialized) {
             keys = Object.keys(this.props.data[0])
-            columns = keys.map(key => ({dataField: key, text: key}))
+            columns = keys.map(key => ({dataField: key, text: key, filter: this.props.filter}))
             keyField = keys.filter(key => {
                 return key.includes('id') || key.includes('ID')
             })[0]
@@ -28,6 +29,7 @@ export default class Table extends Component {
                                 columns={columns}
                                 classes="table-responsive"
                                 selectRow={this.props.selectable ? selectRowProp : undefined}
+                                filter={filterFactory()}
                                 data={this.props.data}/>
                 : null
         );

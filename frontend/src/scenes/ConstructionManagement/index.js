@@ -2,6 +2,7 @@ import React, {Component, ReactPropTypes} from 'react'
 import SearchBar from '../../components/SearchBar'
 import WorkPackageFilter from '../../components/WorkPacakgeFilter'
 import {Button} from 'reactstrap';
+import filterFactory, {textFilter} from 'react-bootstrap-table2-filter'
 import * as api from '../../common/api'
 import Table from "../../components/Table";
 import CustomModal from "../../components/CustomModal";
@@ -288,6 +289,7 @@ export default class ConstructionManagement extends Component {
                             <WorkPackageFilter/>
                             {/* Activity List */}
                             <Table selectable={true}
+                                   filter={textFilter({placeholder: ' '})}
                                    rowSelectHandler={(row, isSelected, rowIndex, e) => this.onActivityRowSelect(row, isSelected, rowIndex, e)}
                                    data={convertData4BootstrapTable(this.state.activities)}/>
                         </div>
@@ -307,10 +309,12 @@ export default class ConstructionManagement extends Component {
                                 <WorkPackageFilter/>
                                 {/* Duration List */}
                                 <Table selectable={true}
+                                       filter={textFilter({placeholder: ' '})}
                                        rowSelectHandler={(row, isSelected, rowIndex, e) => this.onInformationRowSelect(row, isSelected, rowIndex, e)}
                                        data={convertData4BootstrapTable(this.state.durationInfos)}/>
                                 {/* Productivity List */}
                                 <Table selectable={true}
+                                       filter={textFilter({placeholder: ' '})}
                                        rowSelectHandler={(row, isSelected, rowIndex, e) => this.onInformationRowSelect(row, isSelected, rowIndex, e)}
                                        data={convertData4BootstrapTable(this.state.productivityInfos)}/>
                             </div>
