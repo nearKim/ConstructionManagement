@@ -1,6 +1,4 @@
 import React, {Component, ReactPropTypes} from 'react'
-import SearchBar from '../../components/SearchBar'
-import WorkPackageFilter from '../../components/WorkPacakgeFilter'
 import {Button} from 'reactstrap';
 import filterFactory, {textFilter} from 'react-bootstrap-table2-filter'
 import * as api from '../../common/api'
@@ -22,8 +20,11 @@ export default class ConstructionManagement extends Component {
             workPackages: [],
             durationInfos: [],
             productivityInfos: [],
-            selectedActivities: [],
-            selectedInfos: []
+            selected: {
+                selectedActivities: [],
+                selectedDurationInfos: [],
+                selectedProductivityInfos: [],
+            },
         }
 
         this.toggleModal = this.toggleModal.bind(this)
@@ -120,44 +121,71 @@ export default class ConstructionManagement extends Component {
 
     // 선택된 activity row정보를 state에 저장한다
     onActivityRowSelect(row, isSelected, rowIndex, e) {
-        let deleteFlag = this.state.selectedActivities
-            .map(a => a['activity_id'])
-            .includes(row['activity_id'])
         // 만일 현재 row가 state에 존재하면 지워주고 아니면 넣어준다
-        deleteFlag ?
-            this.setState(prevState => ({
-                selectedActivities: prevState.selectedActivities.filter(a => a['activity_id'] !== row['activity_id'])
-            })) :
-            this.setState(prevState => ({
-                selectedActivities: [...prevState.selectedActivities, row]
-            }))
+        isSelected ?
+            this.setState({
+                selected: {
+                    ...this.state.selected,
+                    selectedActivities: [...this.state.selected.selectedActivities, row['activity_id']]
+                }
+            })
+            :
+            this.setState({
+                selected: {
+                    ...this.state.selected,
+                    selectedActivities: this.state.selected.selectedActivities.filter(a => a !== row['activity_id'])
+                }
+            })
     }
 
     // 선택된 Information row 정보를 state에 저장한다
-    onInformationRowSelect(row, isSelected, rowIndex, e) {
-        let deleteFlag = this.state.selectedInfos
-            .map(i => i['data_id'])
-            .includes(row['data_id'])
+    onDurationInformationRowSelect(row, isSelected, rowIndex, e) {
         // 만일 현재 row가 state에 존재하면 지워주고 아니면 넣어준다
-        deleteFlag ?
-            this.setState(prevState => ({
-                selectedActivities: prevState.selectedInfos.filter(i => i['data_id'] !== row['data_id'])
+        isSelected ?
+            this.setState({
+                selected: {
+                    ...this.state.selected,
+                    selectedDurationInfos: [...this.state.selected.selectedDurationInfos, row['data_id']]
+                }
+            })
+            :
+            this.setState({
+                selected: {
+                    ...this.state.selected,
+                    selectedDurationInfos: this.state.selected.selectedDurationInfos.filter(i => i !== row['data_id'])
+                }
+            })
+    }
 
-            })) :
-            this.setState(prevState => ({
-                selectedInfos: [...prevState.selectedInfos, row]
-            }))
+    onProductivityInformationRowSelect(row, isSelected, rowIndex, e) {
+        // 만일 현재 row가 state에 존재하면 지워주고 아니면 넣어준다
+        isSelected ?
+            this.setState({
+                selected: {
+                    ...this.state.selected,
+                    selectedProductivityInfos: [...this.state.selected.selectedProductivityInfos, row['data_id']]
+                }
+            })
+            :
+            this.setState({
+                selected: {
+                    ...this.state.selected,
+                    selectedProductivityInfos: this.state.selected.selectedProductivityInfos.filter(i => i !== row['data_id'])
+                }
+            })
     }
 
     // 1개의 선택된 activity를 사용하여 Duration 혹은 Productivity Information을 생성한다
     createInfo(type) {
+        const {activities, selected} = this.state
         // 단일 information 생성인 경우 activity는 무조건 1개다
-        if (this.state.selectedActivities.length !== 1) {
+        if (this.state.selected.selectedActivities.length !== 1) {
             alert('Activity는 반드시 1개가 선택되어야 합니다.')
             return
         }
+        // 현재 선택된 Activity를 불러온다
+        let activity = activities.find(a => a['activity_id'] === selected.selectedActivities[0])
 
-        let activity = this.state.selectedActivities[0]
         api.makeActivityData(activity['activity_id'], undefined, type, false, activity['description'])
             .then(res => {
                 // 잘 생성된 경우 activity selection을 초기화하고 durationInfo를 업데이트 한다.
@@ -166,14 +194,17 @@ export default class ConstructionManagement extends Component {
                 } else {
                     // 뭔가 문제가 있으면 그냥 결과를 보여주고 refresh 한다
                     alert(res.status)
-                    location.reload()
+                    // location.reload()
                 }
             })
             .then(res => {
                 api.getActivities()
                     .then(res => res.json())
                     .then(activities => this.setState(prevState => ({
-                            selectedActivities: [],
+                            selected: {
+                                ...this.state.selected,
+                                selectedActivities: []
+                            },
                             activities: activities,
                             durationInfos: type === InformationType.DURATION ? [...prevState.durationInfos, res] : prevState.durationInfos,
                             productivityInfos: type === InformationType.PRODUCTIVITY ? [...prevState.productivityInfos, res] : prevState.productivityInfos
@@ -185,22 +216,25 @@ export default class ConstructionManagement extends Component {
     // 1개 이상의 activity를 기존의 information과 링크시킨다
     // TODO: Link하려는 Work package들이 다르면 에러를 발생시킨다
     linkInfo() {
+        let {selectedActivities, selectedDurationInfos, selectedProductivityInfos} = this.state.selected
+        let {productivityInfos, durationInfos} = this.state
         // 갯수 예외처리
-        if (this.state.selectedInfos.length !== 1) {
+        if (selectedDurationInfos.length !== 1 && selectedProductivityInfos.length !== 1) {
             alert('Information은 반드시 1개가 선택되어야 합니다.')
             return
         }
-        if (this.state.selectedActivities.length === 0) {
+        if (selectedActivities.length === 0) {
             alert('적어도 1개의 Activity를 지정하세요.')
             return
         }
 
-        let dataInfo = this.state.selectedInfos[0]
-        let activityIds = this.state.selectedActivities.map(a => a['activity_id'])
+        let dataId = selectedDurationInfos[0] || selectedProductivityInfos[0]
+        let dataInfo = productivityInfos.concat(durationInfos).find(i => i['data_id'] == dataId)
+        let activityIds = selectedActivities
 
         // link 시키고 activity는 빼주고 info는 업데이트 해준다
         dataInfo.use_duration ?
-            api.linkActivitiesWithDuration(dataInfo['data_id'], activityIds)
+            api.linkActivitiesWithDuration(dataId, activityIds)
                 .then(res => {
                     if (res.status === 200) {
                         return res.json()
@@ -213,15 +247,18 @@ export default class ConstructionManagement extends Component {
                     .then(res => Promise.all(res.map(r => r.json())))
                     .then(responses => {
                         this.setState(prevState => ({
-                            selectedActivities: [],
-                            selectedInfos: [],
+                            selected: {
+                                selectedActivities: [],
+                                selectedProductivityInfos: [],
+                                selectedDurationInfos: []
+                            },
                             durationInfos: responses[0],
                             activities: responses[1]
                         }))
                     })
                 )
             :
-            api.linkActivitiesWithProductivity(dataInfo['data_id'], activityIds)
+            api.linkActivitiesWithProductivity(dataId, activityIds)
                 .then(res => {
                     if (res.status === 200) {
                         return res.json()
@@ -234,8 +271,11 @@ export default class ConstructionManagement extends Component {
                     .then(res => Promise.all(res.map(r => r.json())))
                     .then(responses => {
                         this.setState(prevState => ({
-                            selectedActivities: [],
-                            selectedInfos: [],
+                           selected: {
+                                selectedActivities: [],
+                                selectedProductivityInfos: [],
+                                selectedDurationInfos: []
+                            },
                             productivityInfos: responses[0],
                             activities: responses[1]
                         }))
@@ -286,6 +326,7 @@ export default class ConstructionManagement extends Component {
                             {/* Activity List */}
                             <Table selectable={true}
                                    filter={textFilter({placeholder: ' '})}
+                                   selected={this.state.selected.selectedActivities}
                                    rowSelectHandler={(row, isSelected, rowIndex, e) => this.onActivityRowSelect(row, isSelected, rowIndex, e)}
                                    data={convertData4BootstrapTable(this.state.activities)}/>
                         </div>
@@ -304,12 +345,14 @@ export default class ConstructionManagement extends Component {
                                 {/* Duration List */}
                                 <Table selectable={true}
                                        filter={textFilter({placeholder: ' '})}
-                                       rowSelectHandler={(row, isSelected, rowIndex, e) => this.onInformationRowSelect(row, isSelected, rowIndex, e)}
+                                       selected={this.state.selected.selectedDurationInfos}
+                                       rowSelectHandler={(row, isSelected, rowIndex, e) => this.onDurationInformationRowSelect(row, isSelected, rowIndex, e)}
                                        data={convertData4BootstrapTable(this.state.durationInfos)}/>
                                 {/* Productivity List */}
                                 <Table selectable={true}
                                        filter={textFilter({placeholder: ' '})}
-                                       rowSelectHandler={(row, isSelected, rowIndex, e) => this.onInformationRowSelect(row, isSelected, rowIndex, e)}
+                                       selected={this.state.selected.selectedProductivityInfos}
+                                       rowSelectHandler={(row, isSelected, rowIndex, e) => this.onProductivityInformationRowSelect(row, isSelected, rowIndex, e)}
                                        data={convertData4BootstrapTable(this.state.productivityInfos)}/>
                             </div>
                         </div>

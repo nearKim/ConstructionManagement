@@ -20,6 +20,7 @@ export default class Table extends Component {
             sort: true,
             clickToSelect: true,
             bgColor: 'grey',
+            selected: this.props.selected,
             onSelect: this.props.rowSelectHandler
         }
 
