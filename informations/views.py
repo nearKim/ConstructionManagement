@@ -95,13 +95,13 @@ class ProductivityInfoViewSet(viewsets.ModelViewSet):
             activities.update(data=data)
 
             # 현재 들어온 Activity의 duration 값의 기초 통계량을 구한다
-            stat = activities.aggregate(Sum('duration'), Max('duration'), Min('duration'))
+            stat = activities.aggregate(Sum('productivity'), Max('productivity'), Min('productivity'))
 
             # data 통계량 업데이트
-            data.mean = round((data.mean * data.data_cnt + stat['duration__sum']) / \
+            data.mean = round((data.mean * data.data_cnt + stat['productivity__sum']) / \
                               (data.data_cnt + len(activity_ids)), 2)
-            data.maximum = max(stat['duration__max'], data.maximum)
-            data.minimum = min(stat['duration__min'], data.minimum)
+            data.maximum = max(stat['productivity__max'], data.maximum)
+            data.minimum = min(stat['productivity__min'], data.minimum)
             data.data_cnt = data.data_cnt + len(activity_ids)
             data.save()
 
