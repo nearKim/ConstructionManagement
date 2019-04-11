@@ -26,11 +26,14 @@ export default class Table extends Component {
 
         return (
             initialized ?
-                <BootstrapTable keyField={keyField}
+                <BootstrapTable striped hover condensed bordered={false}
+                                bodyStyle={{overflow: 'overlay'}}
+                                keyField={keyField}
                                 columns={columns}
-                                classes="table-responsive"
+                                classes="table table-responsive"
                                 selectRow={this.props.selectable ? selectRowProp : undefined}
                                 filter={filterFactory()}
+                                caption={this.props.caption ? this.props.caption : undefined}
                                 data={this.props.data}/>
                 : null
         );

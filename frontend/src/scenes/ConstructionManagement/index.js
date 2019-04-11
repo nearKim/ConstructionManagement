@@ -347,12 +347,14 @@ export default class ConstructionManagement extends Component {
                                        filter={textFilter({placeholder: ' '})}
                                        selected={this.state.selected.selectedDurationInfos}
                                        rowSelectHandler={(row, isSelected, rowIndex, e) => this.onDurationInformationRowSelect(row, isSelected, rowIndex, e)}
+                                       caption="Duration Data"
                                        data={convertData4BootstrapTable(this.state.durationInfos)}/>
                                 {/* Productivity List */}
                                 <Table selectable={true}
                                        filter={textFilter({placeholder: ' '})}
                                        selected={this.state.selected.selectedProductivityInfos}
                                        rowSelectHandler={(row, isSelected, rowIndex, e) => this.onProductivityInformationRowSelect(row, isSelected, rowIndex, e)}
+                                       caption="Productivity Data"
                                        data={convertData4BootstrapTable(this.state.productivityInfos)}/>
                             </div>
                         </div>
