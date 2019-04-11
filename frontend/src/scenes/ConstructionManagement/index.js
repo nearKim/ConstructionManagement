@@ -1,5 +1,6 @@
 import React, {Component, ReactPropTypes} from 'react'
-import {Button} from 'reactstrap';
+import './index.css'
+import {Button, ButtonGroup} from 'reactstrap';
 import filterFactory, {textFilter} from 'react-bootstrap-table2-filter'
 import * as api from '../../common/api'
 import Table from "../../components/Table";
@@ -12,6 +13,8 @@ export default class ConstructionManagement extends Component {
         super(props)
         this.state = {
             initialized: false,
+            showProjects: false,
+            showResources: false,
             showModal: false,
             modalType: '',
             projects: [],
@@ -55,6 +58,14 @@ export default class ConstructionManagement extends Component {
                 })
             }
         )
+    }
+
+    toggleProjects() {
+        this.setState(prevState => ({showProjects: !prevState.showProjects}))
+    }
+
+    toggleResources() {
+        this.setState(prevState => ({showResources: !prevState.showResources}))
     }
 
     /* Modal Methods */
@@ -271,7 +282,7 @@ export default class ConstructionManagement extends Component {
                     .then(res => Promise.all(res.map(r => r.json())))
                     .then(responses => {
                         this.setState(prevState => ({
-                           selected: {
+                            selected: {
                                 selectedActivities: [],
                                 selectedProductivityInfos: [],
                                 selectedDurationInfos: []
@@ -281,6 +292,56 @@ export default class ConstructionManagement extends Component {
                         }))
                     })
                 )
+    }
+
+    renderProjects() {
+        return (
+            <div id="project-container" className="col-sm-6 text-center">
+                <Button outline block
+                        color="primary"
+                        onClick={() => this.showModal(ModalType.PROJECT)}>Add project</Button>
+                {/* Project List */}
+                <Table selectable={false}
+                       data={convertData4BootstrapTable(this.state.projects)}/>
+            </div>
+        )
+    }
+
+    renderResources() {
+        return (
+            <div id="resource-container" className="col-sm-6 text-center">
+                <Button outline block
+                        color="primary"
+                        onClick={() => this.showModal(ModalType.RESOURCE)}>Import resources
+                </Button>
+                {/* Resource List */}
+                <Table selectable={false}
+                       data={convertData4BootstrapTable(this.state.resources)}/>
+            </div>
+        )
+    }
+
+    renderMainBtnContainer() {
+        return (
+            <div className="row">
+                <div className="col-sm-12 text-center">
+                    <ButtonGroup size="lg">
+                        <Button outline
+                                color="success"
+                                onClick={() => this.linkInfo()}>Link activity
+                        </Button>
+                        <Button outline
+                                color="primary"
+                                onClick={() => this.createInfo(InformationType.DURATION)}>Use duration
+                        </Button>
+                        <Button outline
+                                color="primary"
+                                onClick={() => this.createInfo(InformationType.PRODUCTIVITY)}>Use productivity
+                        </Button>
+                    </ButtonGroup>
+                </div>
+            </div>
+        )
     }
 
     render() {
@@ -300,22 +361,18 @@ export default class ConstructionManagement extends Component {
             this.state.initialized ?
                 <div>
                     <div className="row">
-                        <div className="col-sm-4">
-                            <Button outline color="secondary"
-                                    onClick={() => this.showModal(ModalType.PROJECT)}>Add project</Button>
-                            {/* Project List */}
-                            <Table selectable={false}
-                                   data={convertData4BootstrapTable(this.state.projects)}/>
-                        </div>
-                        <div className="col-sm-8">
+                        <div className="col-sm-12 text-center">
                             <Button outline
                                     color="secondary"
-                                    onClick={() => this.showModal(ModalType.RESOURCE)}>Import resources
-                            </Button>
-                            {/* Resource List */}
-                            <Table selectable={false}
-                                   data={convertData4BootstrapTable(this.state.resources)}/>
+                                    onClick={() => this.toggleProjects()}>Toggle projects</Button>
+                            <Button outline
+                                    color="secondary"
+                                    onClick={() => this.toggleResources()}>Toggle Resources</Button>
                         </div>
+                    </div>
+                    <div className="row">
+                        {this.state.showProjects && this.renderProjects()}
+                        {this.state.showResources && this.renderResources()}
                     </div>
                     <div className="row">
                         <div id="activity-container" className="col-sm-12">
@@ -330,16 +387,7 @@ export default class ConstructionManagement extends Component {
                                    rowSelectHandler={(row, isSelected, rowIndex, e) => this.onActivityRowSelect(row, isSelected, rowIndex, e)}
                                    data={convertData4BootstrapTable(this.state.activities)}/>
                         </div>
-                        <div className="row">
-                            <div id="other-btn-container" className="col-sm-12">
-                                <Button outline color="primary" onClick={() => this.linkInfo()}>Link activity</Button>
-                                <Button outline color="primary"
-                                        onClick={() => this.createInfo(InformationType.DURATION)}>Use duration</Button>
-                                <Button outline color="primary"
-                                        onClick={() => this.createInfo(InformationType.PRODUCTIVITY)}>Use
-                                    productivity</Button>
-                            </div>
-                        </div>
+                        {this.renderMainBtnContainer()}
                         <div className="row">
                             <div id="information-container" className="col-sm-12">
                                 {/* Duration List */}

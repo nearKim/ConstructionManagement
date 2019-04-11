@@ -1,0 +1,13 @@
+button {
+  margin: 5px;
+}
+
+.row {
+  margin: 10px;
+}
+
+.table td,
+.table th {
+    white-space: nowrap;
+    width: 1%;
+}
