@@ -197,6 +197,11 @@ export default class ConstructionManagement extends Component {
         // 현재 선택된 Activity를 불러온다
         let activity = activities.find(a => a['activity_id'] === selected.selectedActivities[0])
 
+        if (activity.data) {
+            alert('선택한 Activity로 만들어진 Information이 존재합니다. 다른 Activity를 선택하세요')
+            return;
+        }
+
         api.makeActivityData(activity['activity_id'], undefined, type, false, activity['description'])
             .then(res => {
                 // 잘 생성된 경우 activity selection을 초기화하고 durationInfo를 업데이트 한다.
