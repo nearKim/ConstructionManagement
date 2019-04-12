@@ -1,9 +1,10 @@
-import React, {Component, ReactPropTypes} from 'react'
-import './index.css'
+import React, {Component, ReactPropTypes} from 'react';
+import './index.css';
 import {Button, ButtonGroup} from 'reactstrap';
-import filterFactory, {textFilter} from 'react-bootstrap-table2-filter'
-import * as api from '../../common/api'
+import filterFactory, {textFilter} from 'react-bootstrap-table2-filter';
+import * as api from '../../common/api';
 import Table from "../../components/Table";
+import NavBar from "../../components/NavBar";
 import CustomModal from "../../components/CustomModal";
 import {InformationType, ModalType} from "../../common/constants";
 import {convertData4BootstrapTable, pop} from "../../common/utils";
@@ -365,6 +366,7 @@ export default class ConstructionManagement extends Component {
         return (
             this.state.initialized ?
                 <div>
+                    <NavBar/>
                     <div className="row">
                         <div className="col-sm-12 text-center">
                             <Button outline
