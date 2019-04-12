@@ -3,12 +3,13 @@ const webpack = require('webpack')
 const BundleTracker = require('webpack-bundle-tracker')
 
 module.exports = {
-    entry: [
-        './frontend/src/frontend.app.js'
-    ],
+    entry: {
+        main: './frontend/src/frontend.app.js',
+        plannedSchedule: './frontend/src/planned_schedule.app.js'
+    },
     output: {
         path: path.resolve(__dirname, 'frontend', 'static', 'frontend'),
-        filename: 'frontend.bundle.js'
+        filename: '[name].bundle.js'
     },
     plugins: [
         new BundleTracker({filename: './webpack-stats.json'})
