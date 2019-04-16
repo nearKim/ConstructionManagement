@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'managements',
     'informations',
     'frontend',
+    'plannedschedules',
 ]
 
 MIDDLEWARE = [
