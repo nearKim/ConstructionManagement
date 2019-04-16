@@ -33,6 +33,7 @@ class Activity(TimeStampedMixin):
 
 
 class Resource(TimeStampedMixin):
+    resource_id = models.CharField(_('리소스 Id'), max_length=300, primary_key=True)
     name = models.CharField(_('리소스 이름'), max_length=300)
     productivity = models.FloatField(_('생산성'), default=0.0)
     work_package = models.ManyToManyField('managements.WorkPackage', related_name='resources')
