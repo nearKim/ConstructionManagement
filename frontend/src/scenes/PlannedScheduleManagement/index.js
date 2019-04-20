@@ -6,6 +6,7 @@ import {ModalType} from "../../common/constants";
 import Table from "../../components/Table";
 import {convertData4BootstrapTable} from "../../common/utils";
 import CustomModal from "../../components/CustomModal";
+import {textFilter} from "react-bootstrap-table2-filter";
 
 export default class PlannedScheduleManagement extends Component {
     constructor(props) {
@@ -17,7 +18,12 @@ export default class PlannedScheduleManagement extends Component {
 
             resources: [],
             plannedSchedules: [],
-            dataInfos: []
+            dataInfos: [],
+
+            selected: {
+                selectedSchedules: [],
+                selectedDatas: []
+            }
         }
 
         this.toggleModal = this.toggleModal.bind(this)
@@ -63,6 +69,40 @@ export default class PlannedScheduleManagement extends Component {
         )
     }
 
+    onScheduleRowSelect(row, isSelected, rowIndex, e) {
+        isSelected ?
+            this.setState({
+                selected: {
+                    ...this.state.selected,
+                    selectedSchedules: [...this.state.selected.selectedSchedules, row['activity_id']]
+                }
+            })
+            :
+            this.setState({
+                selected: {
+                    ...this.state.selected,
+                    selectedSchedules: this.state.selected.selectedSchedules.filter(s => s !== row['activity_id'])
+                }
+            })
+    }
+
+    onDataRowSelect(row, isSelected, rowIndex, e) {
+        isSelected ?
+            this.setState({
+                selected: {
+                    ...this.state.selected,
+                    selectedDatas: [...this.state.selected.selectedDatas, row['data_id']]
+                }
+            })
+            :
+            this.setState({
+                selected: {
+                    ...this.state.selected,
+                    selectedDatas: this.state.selected.selectedDatas.filter(d => d !== row['data_id'])
+                }
+            })
+    }
+
     renderResources() {
         return (
             <div id="resource-container" className="col-sm-6 text-center">
@@ -78,7 +118,7 @@ export default class PlannedScheduleManagement extends Component {
 
     render() {
         return (
-            <div>
+            <div className="container-fluid">
                 <NavBar/>
                 <div className="row">
                     <div className="col-sm-12">
@@ -91,10 +131,22 @@ export default class PlannedScheduleManagement extends Component {
                 </div>
                 <div className="row">
                     <div className="col-sm-6">
-
+                        <Table selectable={true}
+                               filter={textFilter({placeholder: ' '})}
+                               selected={this.state.selectedSchedules}
+                               rowSelectHandler={(row, isSelected, rowIndex, e) => this.onScheduleRowSelect(row, isSelected, rowIndex, e)}
+                               caption="Planned Schedules"
+                               data={convertData4BootstrapTable(this.state.plannedSchedules)}
+                        />
                     </div>
                     <div className="col-sm-6">
-
+                        <Table selectable={true}
+                               filter={textFilter({placeholder: ' '})}
+                               selected={this.state.selectedDatas}
+                               rowSelectHandler={(row, isSelected, rowIndex, e) => this.onDataRowSelect(row, isSelected, rowIndex, e)}
+                               caption="Data Information"
+                               data={convertData4BootstrapTable(this.state.dataInfos)}
+                        />
                     </div>
                 </div>
                 {/* Modals */}
