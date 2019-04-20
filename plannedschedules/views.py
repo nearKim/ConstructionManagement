@@ -2,6 +2,7 @@ import io
 import pandas as pd
 from django.db import IntegrityError
 from django.shortcuts import render
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_207_MULTI_STATUS
 
@@ -92,3 +93,44 @@ class PlannedScheduleCSVimportAPIView(views.APIView):
             return Response(data=result)
         else:
             return Response(status=HTTP_207_MULTI_STATUS, data=result)
+
+
+class PlannedScheduleViewSet(viewsets.ModelViewSet):
+
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return PlannedScheduleRetrieveListSerializer
+        else:
+            return PlannedScheduleCreateUpdateSerializer
+
+    def get_queryset(self):
+        query_string = self.request.query_params.get('work_package', None)
+        queryset = PlannedSchedules.objects \
+            .prefetch_related('work_package') \
+            .all()
+
+        if query_string:
+            work_packages = [query_string] if not isinstance(query_string, list) else query_string
+            return queryset.filter(work_package__in=work_packages)
+        return queryset
+
+    def update(self, request, *args, **kwargs):
+        # PATCH와 PUT을 통합한다
+        partial = True
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['GET'])
+    def work_packages(self, request, pk=None):
+        work_packages = self.get_object().work_package.all()
+        serializer = WorkPackageSerializer(work_packages, many=True)
+        return Response(serializer.data)

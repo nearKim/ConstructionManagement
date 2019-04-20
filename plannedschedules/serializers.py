@@ -2,6 +2,7 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from managements.models import WorkPackage
+from managements.serializers import WorkPackageSerializer
 from .models import *
 
 
@@ -28,3 +29,7 @@ class PlannedScheduleCreateUpdateSerializer(PlannedScheduleBaseSerializer):
         if quantity and duration:
             attrs['productivity'] = quantity / duration
         return attrs
+
+
+class PlannedScheduleRetrieveListSerializer(PlannedScheduleBaseSerializer):
+    work_package = WorkPackageSerializer(many=True, read_only=True)
