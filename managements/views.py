@@ -330,7 +330,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
                 # Resource를 생성하면서 대분류, 소분류를 모두 넣어준다.
                 r, created = Resource.objects.update_or_create(
                     # FIXME: productivity 대체하기
-                    id=row['resourceID'],
+                    resource_id=row['resourceID'],
                     name=row['resourceName'],
                     productivity=1.0,
                 )
