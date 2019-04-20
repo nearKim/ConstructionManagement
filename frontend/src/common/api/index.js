@@ -340,3 +340,23 @@ export function deleteProductivityInfo(dataId) {
         method: 'DELETE'
     })
 }
+
+/**
+ *  PlannedSchedule API
+ */
+
+export function getPlannedSchedules() {
+    return fetch(`${API_V1_ENDPOINT}/planned-schedules/`)
+}
+
+export function importPlannedScheduleCSV(activityCsvFile, activityResourceCsvFile) {
+    let formData = new FormData()
+    formData.append('planned_activity', activityCsvFile)
+    formData.append('activity_resource', activityResourceCsvFile)
+
+    return fetch(`${API_V1_ENDPOINT}/planned-schedules/csv-import/`, {
+        method: 'POST',
+        body: formData
+    })
+}
+
