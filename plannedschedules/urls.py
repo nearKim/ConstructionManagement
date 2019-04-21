@@ -8,6 +8,7 @@ router.register(r'planned-schedules', views.PlannedScheduleViewSet, basename='pl
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
+    # csv-import가 반드시 먼저 와야 한다
+    path('planned-schedules/csv-import/', views.PlannedScheduleCSVimportAPIView.as_view()),
     path('', include(router.urls)),
-    path('planned-schedules/csv-import/', views.PlannedScheduleCSVimportAPIView.as_view())
 ]
