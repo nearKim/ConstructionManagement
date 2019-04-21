@@ -8,7 +8,7 @@ import Table from "../../components/Table";
 import CustomModal from "../../components/CustomModal";
 
 import {textFilter} from "react-bootstrap-table2-filter";
-import {convertData4BootstrapTable} from "../../common/utils";
+import {convertData4BootstrapTable, pop} from "../../common/utils";
 
 export default class PlannedScheduleManagement extends Component {
     constructor(props) {
@@ -123,7 +123,20 @@ export default class PlannedScheduleManagement extends Component {
 
         api.importPlannedScheduleCSV(plannedActivityFile, activityResourceFile)
             .then(res => res.json())
-            .then(res => console.log(res))
+            .then(plannedSchedules => {
+                Object.keys(plannedSchedules).map((key, index) => {
+                    plannedSchedules[key] = JSON.parse(plannedSchedules[key])
+                })
+                let success = pop(plannedSchedules, 'success')
+
+                // 에러 상황을 한번 보여준다.
+                alert('결과를 확인해주세요. \n' + JSON.stringify(plannedSchedules))
+
+                this.setState(prevState => ({
+                        plannedSchedules: [...prevState.plannedSchedules, ...success],
+                    })
+                )
+            })
     }
 
     renderResources() {
