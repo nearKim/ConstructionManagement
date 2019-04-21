@@ -1,12 +1,14 @@
 import React, {Component} from 'react'
-import NavBar from '../../components/NavBar'
-import {Button} from "reactstrap";
+import {Button, Form, FormGroup, Label, Input, Col} from 'reactstrap'
 import * as api from '../../common/api';
+
 import {ModalType} from "../../common/constants";
+import NavBar from '../../components/NavBar'
 import Table from "../../components/Table";
-import {convertData4BootstrapTable} from "../../common/utils";
 import CustomModal from "../../components/CustomModal";
+
 import {textFilter} from "react-bootstrap-table2-filter";
+import {convertData4BootstrapTable} from "../../common/utils";
 
 export default class PlannedScheduleManagement extends Component {
     constructor(props) {
@@ -23,7 +25,10 @@ export default class PlannedScheduleManagement extends Component {
             selected: {
                 selectedSchedules: [],
                 selectedDatas: []
-            }
+            },
+
+            plannedActivityFile: null,
+            activityResourceFile: null,
         }
 
         this.toggleModal = this.toggleModal.bind(this)
@@ -103,15 +108,56 @@ export default class PlannedScheduleManagement extends Component {
             })
     }
 
+    // File input에 변화가 있으면 state를 바꿔준다
+    onFileInputChange(e) {
+        this.setState({[e.target.name]: e.target.files[0]})
+    }
+
+    // state정보를 이용하여 PlannedSchedule을 생성한다.
+    onFileSubmit(event) {
+        let {plannedActivityFile, activityResourceFile} = this.state
+        if (!(plannedActivityFile && activityResourceFile)) {
+            alert('파일이 2개 모두 존재해야 합니다.')
+            return
+        }
+
+        api.importPlannedScheduleCSV(plannedActivityFile, activityResourceFile)
+            .then(res => res.json())
+            .then(res => console.log(res))
+    }
+
     renderResources() {
         return (
-            <div id="resource-container" className="col-sm-6 text-center">
-                <Button outline block
-                        color="primary"
-                        onClick={() => this.showModal()}>Import resources</Button>
-                {/* Resource List */}
-                <Table selectable={false}
-                       data={convertData4BootstrapTable(this.state.resources)}/>
+            <div className="row">
+                <div id="resource-container" className="col-sm-8 text-center">
+                    <Button outline block
+                            color="primary"
+                            onClick={() => this.showModal()}>Import resources</Button>
+                    {/* Resource List */}
+                    <Table selectable={false}
+                           data={convertData4BootstrapTable(this.state.resources)}/>
+                </div>
+                <div id="csv-import-container" className="col-sm-4 text-center">
+                    <FormGroup row>
+                        <Label for="schedule-input" sm={2}>Planned Schedules</Label>
+                        <Col sm={10}>
+                            <Input id="schedule-input"
+                                   type="file"
+                                   name="plannedActivityFile"
+                                   onChange={(e) => this.onFileInputChange(e)}
+                            />
+                        </Col>
+                        <Label for="resource-input" sm={2}>Activity-resource</Label>
+                        <Col sm={10}>
+                            <Input id="resource-input"
+                                   type="file"
+                                   name="activityResourceFile"
+                                   onChange={(e) => this.onFileInputChange(e)}
+                            />
+                        </Col>
+                        <Button className="btn-block" onClick={(e) => this.onFileSubmit(e)}>Submit</Button>
+                    </FormGroup>
+                </div>
             </div>
         )
     }
@@ -122,13 +168,13 @@ export default class PlannedScheduleManagement extends Component {
                 <NavBar/>
                 <div className="row">
                     <div className="col-sm-12">
-                        <Button outline color="secondary" onClick={() => this.toggleResources()}>Toggle
-                            Resources</Button>
+                        <Button outline
+                                className="btn-block"
+                                color="secondary"
+                                onClick={() => this.toggleResources()}>Toggle Resources and File Inputs</Button>
                     </div>
                 </div>
-                <div className="row">
-                    {this.state.showResources && this.renderResources()}
-                </div>
+                {this.state.showResources && this.renderResources()}
                 <div className="row">
                     <div className="col-sm-6">
                         <Table selectable={true}
