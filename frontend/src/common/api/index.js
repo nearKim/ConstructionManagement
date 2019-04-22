@@ -360,3 +360,21 @@ export function importPlannedScheduleCSV(activityCsvFile, activityResourceCsvFil
     })
 }
 
+/**
+ * Allocation API
+ */
+
+export function getAllocations() {
+    return fetch(`${API_V1_ENDPOINT}/allocations/`)
+}
+
+export function createAllocations(createData) {
+    return fetch(`${API_V1_ENDPOINT}/allocations/`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        },
+        body: createData
+    })
+}
