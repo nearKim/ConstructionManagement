@@ -21,11 +21,9 @@ class PlannedSchedules(TimeStampedMixin):
                              on_delete=models.SET_NULL)
 
 
-# class Allocation(TimeStampedMixin):
-#     """
-#     activity = models.OneToOneField
-#     data  = models.ForeignKey
-#     isProductivity = data에 따라서
-#     mode = 유저 인풋
-#     => 이게 Table로 front에 보여줘야 한다.
-#     """
+class Allocation(TimeStampedMixin):
+    activity = models.OneToOneField('plannedschedules.PlannedSchedules', related_name='allocations',
+                                    on_delete=models.CASCADE)
+    data = models.ForeignKey('informations.DataInfo', related_name='allocations', on_delete=models.CASCADE)
+    is_productivity = models.BooleanField(_('생산성 사용여부'))
+    mode = models.SmallIntegerField(_('모드'))

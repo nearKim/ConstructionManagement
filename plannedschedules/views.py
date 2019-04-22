@@ -8,6 +8,7 @@ from rest_framework.status import HTTP_207_MULTI_STATUS
 
 from ConstructionManagement.helper import batch_create_workpackages
 from plannedschedules.serializers import *
+
 from rest_framework import views, viewsets, status
 
 
@@ -134,3 +135,34 @@ class PlannedScheduleViewSet(viewsets.ModelViewSet):
         work_packages = self.get_object().work_package.all()
         serializer = WorkPackageSerializer(work_packages, many=True)
         return Response(serializer.data)
+
+
+class AllocationViewSet(viewsets.ModelViewSet):
+    serializer_class = AllocationSerializer
+
+    def get_queryset(self):
+        return Allocation.objects \
+            .select_related('activity') \
+            .prefetch_related('data') \
+            .all()
+
+    def create(self, request, *args, **kwargs):
+        # 현재 들어온 모든 데이터를 뽑아낸다
+        activity_ids = request.data.get('activity', None)
+        data_id = request.data.get('data', None)
+        is_productivity = request.data.get('is_productivity', None)
+        mode = request.data.get('mode', None)
+
+        # 사용할 객체들을 가져온다
+        planned_schedules = PlannedSchedules.objects.filter(activity_id__in=activity_ids)
+        data = DataInfo.objects.get(data_id=data_id)
+
+        # activityId들을 이용하여 bulk create한다
+        allocation_list = list(
+            map(lambda p: Allocation(activity=p, data=data, is_productivity=not data.use_duration, mode=mode),
+                planned_schedules))
+        allocations = Allocation.objects.bulk_create(allocation_list)
+
+        # 결과를 직렬화하여 던져준다
+        serializer = AllocationSerializer(allocations, many=True)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -5,6 +5,7 @@ from plannedschedules import views
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
 router.register(r'planned-schedules', views.PlannedScheduleViewSet, basename='planned')
+router.register(r'allocations', views.AllocationViewSet, basename='planned')
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [

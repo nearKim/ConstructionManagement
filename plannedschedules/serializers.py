@@ -1,7 +1,9 @@
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
+from rest_framework.relations import PrimaryKeyRelatedField
 
-from managements.models import WorkPackage
+from informations.models import DataInfo
+from managements.models import WorkPackage, Activity
 from managements.serializers import WorkPackageSerializer
 from .models import *
 
@@ -33,3 +35,24 @@ class PlannedScheduleCreateUpdateSerializer(PlannedScheduleBaseSerializer):
 
 class PlannedScheduleRetrieveListSerializer(PlannedScheduleBaseSerializer):
     work_package = WorkPackageSerializer(many=True, read_only=True)
+
+
+class AllocationSerializer(serializers.ModelSerializer):
+    activity = PrimaryKeyRelatedField(read_only=True)
+    data = PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = Allocation
+        fields = '__all__'
+
+    def validate(self, attrs):
+        mode = attrs.get('mode', None)
+
+        if mode is None:
+            raise serializers.ValidationError(_('Mode는 무조건 들어와야 합니다.'))
+        if mode not in [1, 2, 3, 4, 5]:
+            raise serializers.ValidationError(_('Mode는 무조건 1,2,3,4,5중 하나여야 합니다.'))
+
+        return attrs
+
+
