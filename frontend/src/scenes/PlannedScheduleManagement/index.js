@@ -21,6 +21,7 @@ export default class PlannedScheduleManagement extends Component {
             resources: [],
             plannedSchedules: [],
             dataInfos: [],
+            allocations: [],
 
             selected: {
                 selectedSchedules: [],
@@ -39,15 +40,22 @@ export default class PlannedScheduleManagement extends Component {
                 api.getResources(),
                 api.getPlannedSchedules(),
                 api.getDurationInfos(),
-                api.getProductivityInfos()
+                api.getProductivityInfos(),
+                api.getAllocations()
             ]
         ).then(responses => Promise.all(responses.map(r => r.json()))
         ).then(res => {
             this.setState({
                 initialized: true,
                 resources: res[0],
-                plannedSchedules: res[1],
-                dataInfos: [...res[2], ...res[3]]
+                // resource는 convert4Bootstrap에서 없어진다.
+                // resource 어트리뷰트의 이름을 resourceId로 바꿔준다.
+                plannedSchedules: res[1].map(ps => ({
+                    ...ps,
+                    resourceId: ps.resource
+                })).map(({resource, ...attrs}) => attrs),
+                dataInfos: [...res[2], ...res[3]],
+                allocations: res[4]
             })
         })
     }
@@ -176,6 +184,7 @@ export default class PlannedScheduleManagement extends Component {
     }
 
     render() {
+        let {selectedSchedules, selectedDatas} = this.state.selected
         return (
             <div className="container-fluid">
                 <NavBar/>
@@ -188,6 +197,27 @@ export default class PlannedScheduleManagement extends Component {
                     </div>
                 </div>
                 {this.state.showResources && this.renderResources()}
+                <div id="link-status-container" className="row">
+                    <div id="link-planned-schedules-container" className="col-sm-8">
+                        <h2>Selected As-built schedules</h2>
+                        {selectedSchedules.map((schedule, i) => {
+                            return (<b key={i}>{schedule}, </b>)
+                        })}
+                    </div>
+                    <div id="link-data-container" className="col-sm-4">
+                        <h2>Selected Data</h2>
+                        {selectedDatas.map((data, i) => {
+                            return (<b key={i}>{data}, </b>)
+                        })}
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-sm-12">
+                        <Button color="primary"
+                                className="btn-block">Link Activity</Button>
+                    </div>
+                </div>
+
                 <div className="row">
                     <div className="col-sm-6">
                         <Table selectable={true}
@@ -201,10 +231,16 @@ export default class PlannedScheduleManagement extends Component {
                     <div className="col-sm-6">
                         <Table selectable={true}
                                filter={textFilter({placeholder: ' '})}
-                               selected={this.state.selectedDatas}
+                               selected={this.state.selectedData}
                                rowSelectHandler={(row, isSelected, rowIndex, e) => this.onDataRowSelect(row, isSelected, rowIndex, e)}
                                caption="Data Information"
                                data={convertData4BootstrapTable(this.state.dataInfos)}
+                        />
+                        <Table selectable={false}
+                               filter={textFilter({placeholder: ' '})}
+                               selected={this.state.allocations}
+                               caption="Allocations"
+                               data={convertData4BootstrapTable(this.state.allocations)}
                         />
                     </div>
                 </div>
