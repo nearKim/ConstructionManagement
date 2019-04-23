@@ -22,6 +22,7 @@ export default class PlannedScheduleManagement extends Component {
             plannedSchedules: [],
             dataInfos: [],
             allocations: [],
+            mode: null,
 
             selected: {
                 selectedSchedules: [],
@@ -121,6 +122,11 @@ export default class PlannedScheduleManagement extends Component {
         this.setState({[e.target.name]: e.target.files[0]})
     }
 
+    // Input에 변화가 있으면 state를 바꿔준다.
+    onInputChange(e) {
+        this.setState({[e.target.name]: e.target.value})
+    }
+
     // state정보를 이용하여 PlannedSchedule을 생성한다.
     onFileSubmit(event) {
         let {plannedActivityFile, activityResourceFile} = this.state
@@ -146,6 +152,51 @@ export default class PlannedScheduleManagement extends Component {
                 )
             })
     }
+
+    // Link버튼을 눌렀으면 alert창을 띄워주고 createData를 형성하여 api에 던져준다
+    createAllocation(e) {
+        let {selectedSchedules, selectedDatas} = this.state.selected
+
+        // data 개수에 대한 예외처리
+        if (selectedDatas.length !== 1) {
+            alert('반드시 1개의 data만 선택되어야 합니다.')
+            return
+        }
+        // as built 개수에 대한 예외처리
+        if (selectedSchedules.length === 0) {
+            alert('적어도 1개의 as built schedule이 선택되어야 합니다.')
+            return
+        }
+
+        if (!this.state.mode) {
+            alert('mode를 입력하십시오.')
+            return
+        }
+
+        // TODO: isProductivity를 던질필요가 없다.
+        api.createAllocations(selectedSchedules, selectedDatas[0], null, this.state.mode)
+            .then(res => res.json())
+            .then(allocations => {
+                api.getPlannedSchedules()
+                    .then(res => res.json())
+                    .then(plannedSchedules => {
+                        // 초기화를 위한 object
+                        let selected = {
+                            selectedSchedules: [],
+                            selectedDatas: []
+                        }
+                        // Allocation을 생성한 후 update된 plannedActivity를 불러와서 뿌려준다
+                        this.setState(prevState => ({
+                            selected,
+                            plannedSchedules,
+                            allocations: [...prevState.allocations, ...allocations]
+                        }))
+                    })
+            })
+            .catch(e => alert(e))
+
+    }
+
 
     renderResources() {
         return (
@@ -198,23 +249,33 @@ export default class PlannedScheduleManagement extends Component {
                 </div>
                 {this.state.showResources && this.renderResources()}
                 <div id="link-status-container" className="row">
-                    <div id="link-planned-schedules-container" className="col-sm-8">
+                    <div id="link-planned-schedules-container" className="col-sm-4">
                         <h2>Selected As-built schedules</h2>
                         {selectedSchedules.map((schedule, i) => {
                             return (<b key={i}>{schedule}, </b>)
                         })}
                     </div>
+                    <div id="mode-container" className="col-sm-4">
+                        <h2>Mode Select</h2>
+                        <Input id="mode-input"
+                               type="number"
+                               name="mode"
+                               onChange={(e) => this.onInputChange(e)}
+                        />
+
+                    </div>
                     <div id="link-data-container" className="col-sm-4">
                         <h2>Selected Data</h2>
                         {selectedDatas.map((data, i) => {
-                            return (<b key={i}>{data}, </b>)
+                            return (<h4 key={i}>{data} </h4>)
                         })}
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-sm-12">
                         <Button color="primary"
-                                className="btn-block">Link Activity</Button>
+                                className="btn-block"
+                                onClick={(e) => this.createAllocation(e)}>Link Activity</Button>
                     </div>
                 </div>
 
@@ -222,7 +283,7 @@ export default class PlannedScheduleManagement extends Component {
                     <div className="col-sm-6">
                         <Table selectable={true}
                                filter={textFilter({placeholder: ' '})}
-                               selected={this.state.selectedSchedules}
+                               selected={selectedSchedules}
                                rowSelectHandler={(row, isSelected, rowIndex, e) => this.onScheduleRowSelect(row, isSelected, rowIndex, e)}
                                caption="Planned Schedules"
                                data={convertData4BootstrapTable(this.state.plannedSchedules)}
@@ -231,7 +292,7 @@ export default class PlannedScheduleManagement extends Component {
                     <div className="col-sm-6">
                         <Table selectable={true}
                                filter={textFilter({placeholder: ' '})}
-                               selected={this.state.selectedData}
+                               selected={selectedDatas}
                                rowSelectHandler={(row, isSelected, rowIndex, e) => this.onDataRowSelect(row, isSelected, rowIndex, e)}
                                caption="Data Information"
                                data={convertData4BootstrapTable(this.state.dataInfos)}
