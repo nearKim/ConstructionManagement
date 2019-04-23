@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
-import {Button, Form, FormGroup, Label, Input, Col} from 'reactstrap'
+import './index.css';
+import {Button, FormGroup, Label, Input, Col} from 'reactstrap'
 import * as api from '../../common/api';
 
 import {ModalType} from "../../common/constants";
@@ -197,6 +198,11 @@ export default class PlannedScheduleManagement extends Component {
 
     }
 
+    confirmAllocation(e) {
+        if (!confirm('정말 배정을 확정하시겠습니까?')) return
+        // TODO
+    }
+
 
     renderResources() {
         return (
@@ -242,30 +248,32 @@ export default class PlannedScheduleManagement extends Component {
                 <div className="row">
                     <div className="col-sm-12">
                         <Button outline
+                                id="toggle-resource-btn"
                                 className="btn-block"
                                 color="secondary"
                                 onClick={() => this.toggleResources()}>Toggle Resources and File Inputs</Button>
                     </div>
                 </div>
                 {this.state.showResources && this.renderResources()}
-                <div id="link-status-container" className="row">
+                <div id="link-status-container" className="row text-center">
                     <div id="link-planned-schedules-container" className="col-sm-4">
-                        <h2>Selected As-built schedules</h2>
+                        <h3>Selected As-built schedules</h3>
                         {selectedSchedules.map((schedule, i) => {
                             return (<b key={i}>{schedule}, </b>)
                         })}
                     </div>
                     <div id="mode-container" className="col-sm-4">
-                        <h2>Mode Select</h2>
+                        <h3>Mode</h3>
                         <Input id="mode-input"
                                type="number"
                                name="mode"
+                               placeholder="Input Mode here"
                                onChange={(e) => this.onInputChange(e)}
                         />
 
                     </div>
                     <div id="link-data-container" className="col-sm-4">
-                        <h2>Selected Data</h2>
+                        <h3>Selected Data</h3>
                         {selectedDatas.map((data, i) => {
                             return (<h4 key={i}>{data} </h4>)
                         })}
@@ -273,36 +281,48 @@ export default class PlannedScheduleManagement extends Component {
                 </div>
                 <div className="row">
                     <div className="col-sm-12">
-                        <Button color="primary"
+                        <Button id="link-activity-btn"
+                                color="primary"
                                 className="btn-block"
                                 onClick={(e) => this.createAllocation(e)}>Link Activity</Button>
                     </div>
                 </div>
 
-                <div className="row">
+                <div className="row text-center">
                     <div className="col-sm-6">
+                        <span className="table-title">Planned Schedules</span>
                         <Table selectable={true}
                                filter={textFilter({placeholder: ' '})}
                                selected={selectedSchedules}
                                rowSelectHandler={(row, isSelected, rowIndex, e) => this.onScheduleRowSelect(row, isSelected, rowIndex, e)}
-                               caption="Planned Schedules"
                                data={convertData4BootstrapTable(this.state.plannedSchedules)}
                         />
                     </div>
                     <div className="col-sm-6">
-                        <Table selectable={true}
-                               filter={textFilter({placeholder: ' '})}
-                               selected={selectedDatas}
-                               rowSelectHandler={(row, isSelected, rowIndex, e) => this.onDataRowSelect(row, isSelected, rowIndex, e)}
-                               caption="Data Information"
-                               data={convertData4BootstrapTable(this.state.dataInfos)}
-                        />
-                        <Table selectable={false}
-                               filter={textFilter({placeholder: ' '})}
-                               selected={this.state.allocations}
-                               caption="Allocations"
-                               data={convertData4BootstrapTable(this.state.allocations)}
-                        />
+                        <div className="data-information-table-container">
+                            <span className="table-title">Data Information</span>
+                            <Table selectable={true}
+                                   filter={textFilter({placeholder: ' '})}
+                                   selected={selectedDatas}
+                                   rowSelectHandler={(row, isSelected, rowIndex, e) => this.onDataRowSelect(row, isSelected, rowIndex, e)}
+                                   data={convertData4BootstrapTable(this.state.dataInfos)}
+                            />
+                        </div>
+
+                        {/* Confirm Btn */}
+                        <Button id="confirm-allocation-btn"
+                                color="danger"
+                                className="btn-block"
+                                onClick={(e) => this.confirmAllocation(e)}>Confirm Allocation</Button>
+
+                        <div className="data-information-table-container">
+                            <span className="table-title">Allocations</span>
+                            <Table selectable={false}
+                                   filter={textFilter({placeholder: ' '})}
+                                   selected={this.state.allocations}
+                                   data={convertData4BootstrapTable(this.state.allocations)}
+                            />
+                        </div>
                     </div>
                 </div>
                 {/* Modals */}

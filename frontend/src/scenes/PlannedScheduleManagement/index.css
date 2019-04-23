@@ -1,0 +1,35 @@
+.row {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.table-title {
+    font-size: large;
+    font-weight: bold;
+}
+
+#link-status-container {
+    margin: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #F8F8FF;
+    border: solid;
+}
+
+#toggle-resource-btn {
+    margin-bottom: 30px;
+}
+
+#link-activity-btn {
+    margin-top: 15px;
+    margin-bottom: 30px;
+    font-size: large;
+    font-weight: bold;
+}
+
+#confirm-allocation-btn {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: larger;
+    font-weight: bolder;
+}
