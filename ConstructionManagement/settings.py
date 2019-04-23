@@ -38,9 +38,9 @@ def get_secret(setting, secrets=secrets):
 SECRET_KEY = get_secret('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -100,8 +100,8 @@ WSGI_APPLICATION = 'ConstructionManagement.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'yekki',
-        'USER': 'yekki',
+        'NAME': 'construction_management',
+        'USER': 'admin',
         'PASSWORD': get_secret('DB_PWD'),
         'HOST': 'localhost',
         'PORT': '5432',
