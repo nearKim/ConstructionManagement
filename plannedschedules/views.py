@@ -157,6 +157,9 @@ class AllocationViewSet(viewsets.ModelViewSet):
         planned_schedules = PlannedSchedules.objects.filter(activity_id__in=activity_ids)
         data = DataInfo.objects.get(data_id=data_id)
 
+        # PlannedSchedule의 data를 업데이트한다
+        planned_schedules.update(data=data)
+
         # activityId들을 이용하여 bulk create한다
         allocation_list = list(
             map(lambda p: Allocation(activity=p, data=data, is_productivity=not data.use_duration, mode=mode),
