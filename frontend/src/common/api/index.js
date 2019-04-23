@@ -368,13 +368,20 @@ export function getAllocations() {
     return fetch(`${API_V1_ENDPOINT}/allocations/`)
 }
 
-export function createAllocations(createData) {
+export function createAllocations(activities, dataId, isProductivity, mode) {
+    let createData = {
+        activity: activities,
+        data: dataId,
+        is_productivity: isProductivity,
+        mode: mode
+    }
+
     return fetch(`${API_V1_ENDPOINT}/allocations/`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json, text/plain, */*',
             'Content-Type': 'application/json'
         },
-        body: createData
+        body: JSON.stringify(createData)
     })
 }
