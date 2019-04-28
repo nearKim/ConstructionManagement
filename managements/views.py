@@ -172,9 +172,8 @@ class ActivityViewSet(viewsets.ModelViewSet):
         decoded_file = file.read().decode('utf-8')
         io_string = io.StringIO(decoded_file)
 
-        # FIXME: name, description을 추가한 리스트로 교체하기
-        # non_work_packages = ['activityID','name', 'description', 'projectID', 'duration', 'productivity', 'resourceID', 'numofLabour']
-        non_work_packages = ['activityID', 'projectID', 'duration', 'productivity', 'quantity', 'resourceID', 'numofLabour']
+        non_work_packages = ['activityID', 'name', 'description', 'projectID', 'duration', 'productivity', 'resourceID',
+                             'numofLabour']
 
         df = pd.read_csv(io_string)
 
@@ -204,12 +203,11 @@ class ActivityViewSet(viewsets.ModelViewSet):
                 # Activity를 생성하면서 대분류, 소분류를 모두 넣어준다.
                 a, created = Activity.objects.update_or_create(
                     activity_id=row['activityID'],
-                    # FIXME: name, description, quantity 대체하기
-                    name='TEMP_NAME',
-                    description='TEMP_DESCRIPTION',
+                    name=row['name'],
+                    description=row['description'],
                     duration=row['duration'],
                     quantity=row['quantity'],
-                    productivity=row['quantity']/row['duration'],
+                    productivity=row['quantity'] / row['duration'],
                     labor_cnt=row['numofLabour'],
                     project_id=row['projectID'],
                     resource_id=row['resourceID'],
@@ -300,9 +298,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
         decoded_file = file.read().decode('utf-8')
         io_string = io.StringIO(decoded_file)
 
-        # FIXME: productivity 추가한 리스트로 교체하기
-        # non_work_packages = ['resourceId', 'resourceName', 'productivity']
-        non_work_packages = ['resourceID', 'resourceName', 'productivity']
+        non_work_packages = ['resourceID', 'resourceName']
 
         df = pd.read_csv(io_string)
 
@@ -329,10 +325,8 @@ class ResourceViewSet(viewsets.ModelViewSet):
             try:
                 # Resource를 생성하면서 대분류, 소분류를 모두 넣어준다.
                 r, created = Resource.objects.update_or_create(
-                    # FIXME: productivity 대체하기
                     resource_id=row['resourceID'],
                     name=row['resourceName'],
-                    productivity=1.0,
                 )
 
                 r.work_package.add(*parent_packages, *child_packages)

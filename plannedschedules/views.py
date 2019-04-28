@@ -27,7 +27,7 @@ class PlannedScheduleCSVimportAPIView(views.APIView):
         io_file_planned = io.StringIO(decoded_file_planned)
         io_file_resource = io.StringIO(decoded_file_resource)
 
-        non_work_packages = ['activityID', 'WBSID', 'activityName' 'Original Duration(d)', 'resourceID', 'quantity']
+        non_work_packages = ['activityID', 'WBSID', 'activityName' 'duration', 'resourceID', 'quantity']
 
         # pandas dataframe으로 모두 변환한다
         planned_df = pd.read_csv(io_file_planned)
@@ -48,9 +48,7 @@ class PlannedScheduleCSVimportAPIView(views.APIView):
         # 두 dataframe을 activity_id기준으로 outer join한다. 빈값은 None으로 채운다
         df = pd.merge(planned_df, resource_df, how='outer')
 
-        print(df)
         # PlannedSchedule을 생성한다.
-
         for index, row in df.iterrows():
             # 지금 iteration 돌고있는 row에 해당하는 소분류 Work Package 리스트를 모은다. 이 때 nan이라면 무시한다.
             child_packages = list(
@@ -66,7 +64,7 @@ class PlannedScheduleCSVimportAPIView(views.APIView):
                     activity_id=row['activityID'],
                     wbs_id=row['WBSID'],
                     name=row['activityName'],
-                    duration=row['Original Duration(d)'],
+                    duration=row['duration'],
                     resource_id=row['resourceID'],
                     quantity=row['quantity'],
                     data=None
