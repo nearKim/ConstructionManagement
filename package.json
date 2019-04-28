@@ -6,9 +6,7 @@
   "dependencies": {
     "react-bootstrap-table-next": "^3.0.1",
     "react-bootstrap-table2-filter": "^1.1.8",
-    "reactstrap": "^7.1.0"
-  },
-  "devDependencies": {
+    "reactstrap": "^7.1.0",
     "@babel/core": "^7.3.4",
     "@babel/preset-env": "^7.3.4",
     "@babel/preset-react": "^7.0.0",
@@ -22,6 +20,8 @@
     "webpack": "^4.29.6",
     "webpack-bundle-tracker": "^0.4.2-beta",
     "webpack-cli": "^3.2.3"
+  },
+  "devDependencies": {
   },
   "scripts": {
     "dev": "webpack --mode development",
