@@ -385,3 +385,7 @@ export function createAllocations(activities, dataId, isProductivity, mode) {
         body: JSON.stringify(createData)
     })
 }
+
+export function finishAllocations() {
+    return fetch(`${API_V1_ENDPOINT}/allocations/finish/`)
+}
