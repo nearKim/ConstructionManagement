@@ -198,9 +198,14 @@ export default class PlannedScheduleManagement extends Component {
 
     }
 
-    confirmAllocation(e) {
+    confirmAllocation() {
         if (!confirm('정말 배정을 확정하시겠습니까?')) return
-        // TODO
+        api.finishAllocations().then(res => {
+            if (res.ok) alert('성공적으로 import 폴더에 저장하였습니다.')
+            else alert('네트워크 에러가 발생하였습니다.')
+        }).catch(e => {
+            alert(e)
+        })
     }
 
 
@@ -313,7 +318,7 @@ export default class PlannedScheduleManagement extends Component {
                         <Button id="confirm-allocation-btn"
                                 color="danger"
                                 className="btn-block"
-                                onClick={(e) => this.confirmAllocation(e)}>Confirm Allocation</Button>
+                                onClick={() => this.confirmAllocation()}>Confirm Allocation</Button>
 
                         <div className="data-information-table-container">
                             <span className="table-title">Allocations</span>
