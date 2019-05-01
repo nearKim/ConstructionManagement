@@ -1,8 +1,7 @@
 import {InformationType} from '../constants'
 import {fetch} from '../../common/utils'
 
-//FIXME: 환경변수로 포함
-let API_V1_ENDPOINT = 'http://localhost:8000/api/v1'
+let API_V1_ENDPOINT = 'http://54.180.149.235/api/v1'
 
 /**
  * 프로젝트 API
