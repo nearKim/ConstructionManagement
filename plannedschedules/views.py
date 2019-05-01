@@ -1,15 +1,69 @@
 import io
+import os
+
+from django.conf import settings
 import pandas as pd
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.db import IntegrityError
-from django.shortcuts import render
+from django.db.models import Case, When, BooleanField
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.status import HTTP_207_MULTI_STATUS
+from rest_framework.status import *
 
 from ConstructionManagement.helper import batch_create_workpackages
 from plannedschedules.serializers import *
 
 from rest_framework import views, viewsets, status
+
+INPUT_PATH = os.path.join(os.path.dirname(settings.BASE_DIR), 'import')
+EXPORT_PATH = os.path.join(os.path.dirname(settings.BASE_DIR), 'export')
+
+
+class AllocationFinishView(views.APIView):
+    def post(self, request, format=None):
+        # Debug가 True이면 403을 반환한다
+        if settings.DEBUG:
+            return Response(status=HTTP_403_FORBIDDEN, data='You are in DEBUG mode')
+
+        try:
+            # Allocation들을 모두 주어진 장소에 저장한다.
+            allocations = list(Allocation.objects.all().values('activity_id', 'data_id', 'mode', 'is_productivity'))
+            allocation_df = pd.DataFrame(allocations)
+            allocation_df.rename(inplace=True, columns={
+                'activity_id': 'activityID',
+                'data_id': 'dataID',
+                'is_productivity': 'isProductivity'
+            })
+
+            # Activity, DataInfo를 조합하여 원하는 dataframe을 만든 후
+            activities = list(Activity.objects.all().values('activity_id', 'project_id', 'duration', 'productivity', 'data_id'))
+            activity_df = pd.DataFrame(activities)
+
+            datas = list(DataInfo.objects.annotate(
+                is_productivity=Case(
+                    When(use_duration=True, then=False),
+                    When(use_duration=False, then=True),
+                    output_field=BooleanField()
+                )
+            ).values('data_id', 'is_productivity'))
+            data_df = pd.DataFrame(datas)
+            merged_df = pd.merge(activity_df, data_df, how='inner', on='data_id')
+            merged_df.rename(inplace=True, columns={
+                "activity_id": "activityID",
+                "data_id": "dataID",
+                "project_id": "projectID",
+                "is_productivity": "isProductivity"
+            })
+
+            # 원하는 곳에 CSV로 저장
+            allocation_df.to_csv(os.path.join(INPUT_PATH, 'connection.csv'))
+            merged_df.to_csv(os.path.join(INPUT_PATH, 'actualDB.csv'))
+
+        except Exception as e:
+            print(e)
+            return Response(HTTP_500_INTERNAL_SERVER_ERROR, data=e)
+        return Response(HTTP_200_OK, data='success')
 
 
 class PlannedScheduleCSVimportAPIView(views.APIView):
@@ -21,6 +75,11 @@ class PlannedScheduleCSVimportAPIView(views.APIView):
         # 파일이 하나라도 없으면 404를 띄운다
         if not planned_activity or not activity_resource:
             return Response(data={'error': 'Lack of Files'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Production 상황에서는 들어온 파일들을 지정된 장소에 저장한다.
+        if not settings.DEBUG:
+            default_storage.save(os.path.join(INPUT_PATH, 'dependency.csv'), ContentFile(planned_activity.read()))
+            default_storage.save(os.path.join(INPUT_PATH, 'resource.csv'), ContentFile(activity_resource.read()))
 
         decoded_file_planned = planned_activity.read().decode('utf-8')
         decoded_file_resource = activity_resource.read().decode('utf-8')
