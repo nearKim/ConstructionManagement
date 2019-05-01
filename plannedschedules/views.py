@@ -86,7 +86,7 @@ class PlannedScheduleCSVimportAPIView(views.APIView):
         io_file_planned = io.StringIO(decoded_file_planned)
         io_file_resource = io.StringIO(decoded_file_resource)
 
-        non_work_packages = ['activityID', 'WBSID', 'activityName' 'duration', 'resourceID', 'quantity']
+        non_work_packages = ['activityID', 'WBSID', 'activityName' 'duration']
 
         # pandas dataframe으로 모두 변환한다
         planned_df = pd.read_csv(io_file_planned)
