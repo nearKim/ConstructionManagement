@@ -4,6 +4,7 @@ import os
 from django.conf import settings
 import pandas as pd
 from django.core.files.base import ContentFile
+from copy import deepcopy
 from django.core.files.storage import default_storage
 from django.db import IntegrityError
 from django.db.models import Case, When, BooleanField
@@ -16,14 +17,11 @@ from plannedschedules.serializers import *
 
 from rest_framework import views, viewsets, status
 
-INPUT_PATH = os.path.join(os.path.dirname(settings.BASE_DIR), 'import')
-EXPORT_PATH = os.path.join(os.path.dirname(settings.BASE_DIR), 'export')
-
 
 class AllocationFinishView(views.APIView):
-    def post(self, request, format=None):
+    def get(self, request, format=None):
         # Debug가 True이면 403을 반환한다
-        if settings.DEBUG:
+        if not settings.DEBUG:
             return Response(status=HTTP_403_FORBIDDEN, data='You are in DEBUG mode')
 
         try:
@@ -57,13 +55,13 @@ class AllocationFinishView(views.APIView):
             })
 
             # 원하는 곳에 CSV로 저장
-            allocation_df.to_csv(os.path.join(INPUT_PATH, 'connection.csv'))
-            merged_df.to_csv(os.path.join(INPUT_PATH, 'actualDB.csv'))
+            allocation_df.to_csv(os.path.join(settings.INPUT_DIR, 'connection.csv'))
+            merged_df.to_csv(os.path.join(settings.INPUT_DIR, 'actualDB.csv'))
 
         except Exception as e:
             print(e)
             return Response(HTTP_500_INTERNAL_SERVER_ERROR, data=e)
-        return Response(HTTP_200_OK, data='success')
+        return Response(HTTP_200_OK)
 
 
 class PlannedScheduleCSVimportAPIView(views.APIView):
@@ -77,12 +75,32 @@ class PlannedScheduleCSVimportAPIView(views.APIView):
             return Response(data={'error': 'Lack of Files'}, status=status.HTTP_404_NOT_FOUND)
 
         # Production 상황에서는 들어온 파일들을 지정된 장소에 저장한다.
+        # https://stackoverflow.com/a/23383295/8897256
         if not settings.DEBUG:
-            default_storage.save(os.path.join(INPUT_PATH, 'dependency.csv'), ContentFile(planned_activity.read()))
-            default_storage.save(os.path.join(INPUT_PATH, 'resource.csv'), ContentFile(activity_resource.read()))
+            # deep copy
+            planned_activity_clone = deepcopy(planned_activity)
+            activity_resource_clone = deepcopy(activity_resource)
+
+            dependency_filename = os.path.join(settings.INPUT_DIR, 'dependency.csv')
+            resource_filename = os.path.join(settings.INPUT_DIR, 'resource.csv')
+
+            dependency_fout = open(dependency_filename, 'wb+')
+            resource_fout = open(resource_filename, 'wb+')
+
+            dependency_content = ContentFile(planned_activity_clone.read())
+            resource_content = ContentFile(activity_resource_clone.read())
+
+            for chunk in dependency_content.chunks():
+                dependency_fout.write(chunk)
+            for chunk in resource_content.chunks():
+                resource_fout.write(chunk)
+
+            resource_fout.close()
+            dependency_fout.close()
 
         decoded_file_planned = planned_activity.read().decode('utf-8')
         decoded_file_resource = activity_resource.read().decode('utf-8')
+
         io_file_planned = io.StringIO(decoded_file_planned)
         io_file_resource = io.StringIO(decoded_file_resource)
 
