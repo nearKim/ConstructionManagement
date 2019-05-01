@@ -32,6 +32,8 @@ export default class PlannedScheduleManagement extends Component {
 
             plannedActivityFile: null,
             activityResourceFile: null,
+            dependencyFile: null,
+            resourceFile: null,
         }
 
         this.toggleModal = this.toggleModal.bind(this)
@@ -130,13 +132,13 @@ export default class PlannedScheduleManagement extends Component {
 
     // state정보를 이용하여 PlannedSchedule을 생성한다.
     onFileSubmit(event) {
-        let {plannedActivityFile, activityResourceFile} = this.state
-        if (!(plannedActivityFile && activityResourceFile)) {
-            alert('파일이 2개 모두 존재해야 합니다.')
+        let {plannedActivityFile, activityResourceFile, dependencyFile, resourceFile} = this.state
+        if (!(plannedActivityFile && activityResourceFile && dependencyFile && resourceFile)) {
+            alert('파일이 4개 모두 존재해야 합니다.')
             return
         }
 
-        api.importPlannedScheduleCSV(plannedActivityFile, activityResourceFile)
+        api.importPlannedScheduleCSV(plannedActivityFile, activityResourceFile, dependencyFile, resourceFile)
             .then(res => res.json())
             .then(plannedSchedules => {
                 Object.keys(plannedSchedules).map((key, index) => {
@@ -230,11 +232,27 @@ export default class PlannedScheduleManagement extends Component {
                                    onChange={(e) => this.onFileInputChange(e)}
                             />
                         </Col>
-                        <Label for="resource-input" sm={2}>Activity-resource</Label>
+                        <Label for="activity-resource-input" sm={2}>Activity-resource</Label>
+                        <Col sm={10}>
+                            <Input id="activity-resource-input"
+                                   type="file"
+                                   name="activityResourceFile"
+                                   onChange={(e) => this.onFileInputChange(e)}
+                            />
+                        </Col>
+                        <Label for="dependency-input" sm={2}>Dependency</Label>
+                        <Col sm={10}>
+                            <Input id="dependency-input"
+                                   type="file"
+                                   name="dependencyFile"
+                                   onChange={(e) => this.onFileInputChange(e)}
+                            />
+                        </Col>
+                        <Label for="resource-input" sm={2}>Resource</Label>
                         <Col sm={10}>
                             <Input id="resource-input"
                                    type="file"
-                                   name="activityResourceFile"
+                                   name="resourceFile"
                                    onChange={(e) => this.onFileInputChange(e)}
                             />
                         </Col>

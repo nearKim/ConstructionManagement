@@ -349,10 +349,12 @@ export function getPlannedSchedules() {
     return fetch(`${API_V1_ENDPOINT}/planned-schedules/`)
 }
 
-export function importPlannedScheduleCSV(activityCsvFile, activityResourceCsvFile) {
+export function importPlannedScheduleCSV(activityCsvFile, activityResourceCsvFile, dependencyFile, resourceFile) {
     let formData = new FormData()
     formData.append('planned_activity', activityCsvFile)
     formData.append('activity_resource', activityResourceCsvFile)
+    formData.append('dependency', dependencyFile)
+    formData.append('resource', resourceFile)
 
     return fetch(`${API_V1_ENDPOINT}/planned-schedules/csv-import/`, {
         method: 'POST',
