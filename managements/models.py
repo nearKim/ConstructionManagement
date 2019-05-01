@@ -16,7 +16,7 @@ class Activity(TimeStampedMixin):
     name = models.CharField(_('액티비티 이름'), max_length=300)
     description = models.TextField(_('액티비티 설명'), blank=True)
     duration = models.PositiveIntegerField(_('기간'), default=0)
-    productivity = models.FloatField(_('생산성'), default=0.0)
+    productivity = models.FloatField(_('생산성'), null=True, blank=True)
     labor_cnt = models.PositiveIntegerField(_('인력 총원'), default=0)
 
     project = models.ForeignKey('managements.Project', related_name='activities', on_delete=models.CASCADE)
