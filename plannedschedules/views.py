@@ -21,7 +21,7 @@ from rest_framework import views, viewsets, status
 class AllocationFinishView(views.APIView):
     def get(self, request, format=None):
         # Debug가 True이면 403을 반환한다
-        if not settings.DEBUG:
+        if settings.DEBUG:
             return Response(status=HTTP_403_FORBIDDEN, data='You are in DEBUG mode')
 
         try:

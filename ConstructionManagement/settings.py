@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import json
 import os
 from django.core.exceptions import ImproperlyConfigured
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
@@ -20,6 +23,13 @@ INPUT_DIR = os.path.abspath(os.path.join(BASE_DIR, '../resources/input'))
 OUTPUT_DIR = os.path.abspath(os.path.join(BASE_DIR, '../resources/output'))
 
 secret_path = os.path.join(BASE_DIR, 'secrets.json')
+
+# Sentry
+sentry_sdk.init(
+    dsn="https://1100d30fa0f54c049580e241cb6d2ab3@sentry.io/1450238",
+    integrations=[DjangoIntegration()]
+)
+
 
 with open(secret_path) as f:
     secrets = json.loads(f.read())
