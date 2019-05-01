@@ -80,23 +80,37 @@ class PlannedScheduleCSVimportAPIView(views.APIView):
             # deep copy
             planned_activity_clone = deepcopy(planned_activity)
             activity_resource_clone = deepcopy(activity_resource)
+            dependency = request.FILES.get('dependency', None)
+            resource = request.FILES.get('resource', None)
 
+            activity_filename = os.path.join(settings.INPUT_DIR, 'activity.csv')
+            activity_resource_filename = os.path.join(settings.INPUT_DIR, 'actResource.csv')
             dependency_filename = os.path.join(settings.INPUT_DIR, 'dependency.csv')
             resource_filename = os.path.join(settings.INPUT_DIR, 'resource.csv')
 
+            activity_fout = open(activity_filename, 'wb+')
+            activity_resource_fout = open(activity_resource_filename, 'wb+')
             dependency_fout = open(dependency_filename, 'wb+')
             resource_fout = open(resource_filename, 'wb+')
 
-            dependency_content = ContentFile(planned_activity_clone.read())
-            resource_content = ContentFile(activity_resource_clone.read())
+            activity_content = ContentFile(planned_activity_clone.read())
+            activity_resource_content = ContentFile(activity_resource_clone.read())
+            dependency_content = ContentFile(dependency.read())
+            resource_content = ContentFile(resource.read())
 
+            for chunk in activity_content.chunks():
+                activity_fout.write(chunk)
+            for chunk in activity_resource_content.chunks():
+                activity_resource_fout.write(chunk)
             for chunk in dependency_content.chunks():
                 dependency_fout.write(chunk)
             for chunk in resource_content.chunks():
                 resource_fout.write(chunk)
 
-            resource_fout.close()
+            activity_resource_fout.close()
+            activity_fout.close()
             dependency_fout.close()
+            resource_fout.close()
 
         decoded_file_planned = planned_activity.read().decode('utf-8')
         decoded_file_resource = activity_resource.read().decode('utf-8')
