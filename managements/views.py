@@ -173,7 +173,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
         io_string = io.StringIO(decoded_file)
 
         non_work_packages = ['activityID', 'name', 'description', 'projectID', 'duration', 'productivity', 'resourceID',
-                             'numofLabour']
+                             'numofLabour', 'quantity']
 
         df = pd.read_csv(io_string)
 
