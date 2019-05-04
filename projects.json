@@ -1,0 +1,71 @@
+[
+{
+  "model": "managements.project",
+  "pk": 1,
+  "fields": {
+    "created": "2019-05-01T14:53:14.689Z",
+    "modified": "2019-05-01T14:53:14.689Z",
+    "name": "UAE plant construction",
+    "description": "\uc544\ub78d\uc5d0\ubbf8\ub9ac\ud2b8 \uc6d0\uc790\ub825 \ubc1c\uc804\uc18c \uac74\uc124\uc0ac\uc5c5"
+  }
+},
+{
+  "model": "managements.project",
+  "pk": 2,
+  "fields": {
+    "created": "2019-05-01T14:53:44.122Z",
+    "modified": "2019-05-01T14:53:44.122Z",
+    "name": "Guro Digital Complex construction",
+    "description": "\uad6c\ub85c\ub514\uc9c0\ud138\ub2e8\uc9c0 \uac74\uc124\uc0ac\uc5c5"
+  }
+},
+{
+  "model": "managements.project",
+  "pk": 3,
+  "fields": {
+    "created": "2019-05-01T14:54:37.443Z",
+    "modified": "2019-05-01T14:54:37.443Z",
+    "name": "Old Park rehabilitation",
+    "description": "\ub099\ud6c4\uacf5\uc6d0 \uc7ac\uc0dd \ud504\ub85c\uc81d\ud2b8"
+  }
+},
+{
+  "model": "managements.project",
+  "pk": 4,
+  "fields": {
+    "created": "2019-05-01T14:55:30.026Z",
+    "modified": "2019-05-01T14:55:30.026Z",
+    "name": "Korea-Myanmar Friendship Bridge",
+    "description": "\ud55c-\ubbf8\uc580\ub9c8 \uc6b0\uc815\uc758 \ub2e4\ub9ac \uac74\uc124\uc0ac\uc5c5"
+  }
+},
+{
+  "model": "managements.project",
+  "pk": 5,
+  "fields": {
+    "created": "2019-05-01T14:55:41.005Z",
+    "modified": "2019-05-01T14:55:41.005Z",
+    "name": "City Gate 88",
+    "description": "\ud55c-\ubbf8\uc580\ub9c8 \uc6b0\uc815\uc758 \ub2e4\ub9ac \uac74\uc124\uc0ac\uc5c5"
+  }
+},{
+  "model": "managements.project",
+  "pk": 6,
+  "fields": {
+    "created": "2019-05-01T14:56:00.244Z",
+    "modified": "2019-05-01T14:56:00.244Z",
+    "name": "\uac74\uc124\uc778\ub825\uc591\uc131 \ub9c8\uc2a4\ud130\ud50c\ub79c \uc218\ub9bd \ubc0f \ud574\uc678 \uc124\uacc4\uae30\uc220 \uace0\uae09\uc778\ub825\uc591\uc131",
+    "description": ""
+  }
+},
+{
+  "model": "managements.project",
+  "pk": 7,
+  "fields": {
+    "created": "2019-05-01T14:56:15.960Z",
+    "modified": "2019-05-01T14:56:15.960Z",
+    "name": "\ub3c4\uc2ec\uc7ac\uc0dd \uc0ac\uc5c5\uad00\ub9ac\uc2dc\uc2a4\ud15c \uac1c\ubc1c (8\ucc28\ub144\ub3c4)",
+    "description": ""
+  }
+}
+]
