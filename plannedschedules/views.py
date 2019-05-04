@@ -58,6 +58,22 @@ class AllocationFinishView(views.APIView):
             allocation_df.to_csv(os.path.join(settings.INPUT_DIR, 'connection.csv'))
             merged_df.to_csv(os.path.join(settings.INPUT_DIR, 'actualDB.csv'))
 
+            # input폴더에 4개의 파일이 모두 존재하는지 확인한다.
+            inputs = [csv_file for csv_file in os.listdir(settings.INPUT_DIR) if '.csv' in csv_file]
+            if not len(inputs) == 4:
+                return Response({"Input dir Error": "Not 4 csvs. Check input dir"},
+                                status=HTTP_500_INTERNAL_SERVER_ERROR)
+
+            # 예끼의 java를 실행한다
+            cmd = 'cd /home/ubuntu/data/Mushroom/src && java -cp ".:/home/ubuntu/data/Mushroom/lib/commons-math3-3.6.1.jar"  experiment.test'
+            os.system(cmd)
+
+            # output 폴더에 2개의 파일이 생성되었는지 확인한다.
+            outputs = [csv_file for csv_file in os.listdir(settings.OUTPUT_DIR) if '.csv' in csv_file]
+            if not len(outputs) == 2:
+                return Response({"Output dir Error": "Not 2 csvs. Check output dir"},
+                                status=HTTP_500_INTERNAL_SERVER_ERROR)
+
         except Exception as e:
             print(e)
             return Response(HTTP_500_INTERNAL_SERVER_ERROR, data=e)
