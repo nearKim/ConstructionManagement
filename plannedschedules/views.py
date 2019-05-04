@@ -60,8 +60,8 @@ class AllocationFinishView(views.APIView):
 
             # input폴더에 4개의 파일이 모두 존재하는지 확인한다.
             inputs = [csv_file for csv_file in os.listdir(settings.INPUT_DIR) if '.csv' in csv_file]
-            if not len(inputs) == 4:
-                return Response({"Input dir Error": "Not 4 csvs. Check input dir"},
+            if not len(inputs) == 6:
+                return Response({"Input dir Error": "Not 6 csvs. Check input dir"},
                                 status=HTTP_500_INTERNAL_SERVER_ERROR)
 
             # 예끼의 java를 실행한다
