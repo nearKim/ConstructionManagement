@@ -55,8 +55,8 @@ class AllocationFinishView(views.APIView):
             })
 
             # 원하는 곳에 CSV로 저장
-            allocation_df.to_csv(os.path.join(settings.INPUT_DIR, 'connection.csv'))
-            merged_df.to_csv(os.path.join(settings.INPUT_DIR, 'actualDB.csv'))
+            allocation_df.to_csv(os.path.join(settings.INPUT_DIR, 'connection.csv'), index=False)
+            merged_df.to_csv(os.path.join(settings.INPUT_DIR, 'actualDB.csv'), index=False)
 
             # input폴더에 4개의 파일이 모두 존재하는지 확인한다.
             inputs = [csv_file for csv_file in os.listdir(settings.INPUT_DIR) if '.csv' in csv_file]
