@@ -58,6 +58,22 @@ class AllocationFinishView(views.APIView):
             allocation_df.to_csv(os.path.join(settings.INPUT_DIR, 'connection.csv'))
             merged_df.to_csv(os.path.join(settings.INPUT_DIR, 'actualDB.csv'))
 
+            # input폴더에 4개의 파일이 모두 존재하는지 확인한다.
+            inputs = [csv_file for csv_file in os.listdir(settings.INPUT_DIR) if '.csv' in csv_file]
+            if not len(inputs) == 4:
+                return Response({"Input dir Error": "Not 4 csvs. Check input dir"},
+                                status=HTTP_500_INTERNAL_SERVER_ERROR)
+
+            # 예끼의 java를 실행한다
+            cmd = 'cd /home/ubuntu/data/Mushroom/src && java -cp ".:/home/ubuntu/data/Mushroom/lib/commons-math3-3.6.1.jar"  experiment.test'
+            os.system(cmd)
+
+            # output 폴더에 2개의 파일이 생성되었는지 확인한다.
+            outputs = [csv_file for csv_file in os.listdir(settings.OUTPUT_DIR) if '.csv' in csv_file]
+            if not len(outputs) == 2:
+                return Response({"Output dir Error": "Not 2 csvs. Check output dir"},
+                                status=HTTP_500_INTERNAL_SERVER_ERROR)
+
         except Exception as e:
             print(e)
             return Response(HTTP_500_INTERNAL_SERVER_ERROR, data=e)
@@ -80,23 +96,37 @@ class PlannedScheduleCSVimportAPIView(views.APIView):
             # deep copy
             planned_activity_clone = deepcopy(planned_activity)
             activity_resource_clone = deepcopy(activity_resource)
+            dependency = request.FILES.get('dependency', None)
+            resource = request.FILES.get('resource', None)
 
+            activity_filename = os.path.join(settings.INPUT_DIR, 'activity.csv')
+            activity_resource_filename = os.path.join(settings.INPUT_DIR, 'actResource.csv')
             dependency_filename = os.path.join(settings.INPUT_DIR, 'dependency.csv')
             resource_filename = os.path.join(settings.INPUT_DIR, 'resource.csv')
 
+            activity_fout = open(activity_filename, 'wb+')
+            activity_resource_fout = open(activity_resource_filename, 'wb+')
             dependency_fout = open(dependency_filename, 'wb+')
             resource_fout = open(resource_filename, 'wb+')
 
-            dependency_content = ContentFile(planned_activity_clone.read())
-            resource_content = ContentFile(activity_resource_clone.read())
+            activity_content = ContentFile(planned_activity_clone.read())
+            activity_resource_content = ContentFile(activity_resource_clone.read())
+            dependency_content = ContentFile(dependency.read())
+            resource_content = ContentFile(resource.read())
 
+            for chunk in activity_content.chunks():
+                activity_fout.write(chunk)
+            for chunk in activity_resource_content.chunks():
+                activity_resource_fout.write(chunk)
             for chunk in dependency_content.chunks():
                 dependency_fout.write(chunk)
             for chunk in resource_content.chunks():
                 resource_fout.write(chunk)
 
-            resource_fout.close()
+            activity_resource_fout.close()
+            activity_fout.close()
             dependency_fout.close()
+            resource_fout.close()
 
         decoded_file_planned = planned_activity.read().decode('utf-8')
         decoded_file_resource = activity_resource.read().decode('utf-8')
