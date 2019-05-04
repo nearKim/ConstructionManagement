@@ -168,8 +168,8 @@ class PlannedScheduleCSVimportAPIView(views.APIView):
             )
             try:
 
-                quantity = None if pd.is_na(row['quantity']) or pd.isnull(row['quantity']) else row['quantity']
-                resource_id = None if pd.is_na(row['resourceID']) or pd.isnull(row['resourceID']) else row['resourceID']
+                quantity = None if pd.isna(row['quantity']) or pd.isnull(row['quantity']) else row['quantity']
+                resource_id = None if pd.isna(row['resourceID']) or pd.isnull(row['resourceID']) else row['resourceID']
                 p, created = PlannedSchedules.objects.update_or_create(
                     activity_id=row['activityID'],
                     wbs_id=row['WBSID'],
