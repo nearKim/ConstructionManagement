@@ -9,4 +9,11 @@ let ModalType = {
     PROJECT: 'project',
 }
 
-export {InformationType,ModalType}
+let ChartMode = {
+    CI: 'CI',
+    CRI: 'CRI',
+    SSI: 'SSI',
+    SI: 'SI'
+}
+
+export {InformationType, ModalType, ChartMode}

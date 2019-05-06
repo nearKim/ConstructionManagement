@@ -400,3 +400,7 @@ export function finishAllocations() {
 export function getHistogramData() {
     return fetch(`${API_V1_ENDPOINT}/histogram/`)
 }
+
+export function getScheduleChartData() {
+    return fetch(`${API_V1_ENDPOINT}/schedule-chart/`)
+}

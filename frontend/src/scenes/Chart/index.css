@@ -18,3 +18,7 @@ th, td {
     margin: 20px;
     text-align: center;
 }
+
+.chart-mode-btn-container {
+    text-align: center;
+}
