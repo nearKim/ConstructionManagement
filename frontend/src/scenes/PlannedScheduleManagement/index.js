@@ -212,17 +212,18 @@ export default class PlannedScheduleManagement extends Component {
 
 
     renderResources() {
+        const resources = this.state.resources.map(({resource_id, name}) => ({resource_id, name}))
         return (
             <div className="row">
-                <div id="resource-container" className="col-sm-8 text-center">
+                <div id="resource-container" className="col-sm-4 text-center">
                     <Button outline block
                             color="primary"
                             onClick={() => this.showModal()}>Import resources</Button>
                     {/* Resource List */}
                     <Table selectable={false}
-                           data={convertData4BootstrapTable(this.state.resources)}/>
+                           data={convertData4BootstrapTable(resources)}/>
                 </div>
-                <div id="csv-import-container" className="col-sm-4 text-center">
+                <div id="csv-import-container" className="col-sm-8 text-center">
                     <FormGroup row>
                         <Label for="schedule-input" sm={2}>Planned Schedules</Label>
                         <Col sm={10}>

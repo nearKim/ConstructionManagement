@@ -201,9 +201,8 @@ class ActivityViewSet(viewsets.ModelViewSet):
             )
             try:
                 # quantity가 Null이거나 Nan이라면 명시적으로 None을 넣어준다
-                productivity = None \
-                    if pd.isnull(row['quantity']) or pd.isna(row['quantity']) \
-                    else row['quantity'] / row['duration']
+                quantity = None if pd.isnull(row['quantity']) or pd.isna(row['quantity']) else row['quantity']
+                productivity = row['quantity'] / row['duration'] if quantity else None
 
                 # Activity를 생성하면서 대분류, 소분류를 모두 넣어준다.
                 a, created = Activity.objects.update_or_create(
@@ -211,7 +210,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
                     name=row['name'],
                     description=row['description'],
                     duration=row['duration'],
-                    quantity=row['quantity'],
+                    quantity=quantity,
                     productivity=productivity,
                     labor_cnt=row['numofLabour'],
                     project_id=row['projectID'],
