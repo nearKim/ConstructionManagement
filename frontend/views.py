@@ -7,3 +7,7 @@ def index(request):
 
 def planned_schedule(request):
     return render(request, 'frontend/planned_schedule.html')
+
+
+def chart(request):
+    return render(request, 'frontend/chart.html')
