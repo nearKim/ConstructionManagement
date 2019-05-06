@@ -137,7 +137,7 @@ export default class Chart extends Component {
                     margin={{left: 50}}>
                     <VerticalGridLines/>
                     <HorizontalGridLines/>
-                    <XAxis/>
+                    <XAxis tickLabelAngle={-45}/>
                     <YAxis/>
                     <VerticalBarSeries data={data}/>
                 </FlexibleWidthXYPlot>
