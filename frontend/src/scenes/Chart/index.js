@@ -68,19 +68,19 @@ export default class Chart extends Component {
                 <h1 className="chart-title"></h1>
                 <div className="chart-mode-btn-container">
                     <ButtonGroup size="lg">
-                        <Button color="primary"
+                        <Button color="secondary"
                                 size="lg"
                                 onClick={(e) => this.onChartModeBtnClick(ChartMode.CI)}
                                 active={this.state.chartMode === ChartMode.CI}>CI</Button>
-                        <Button color="primary"
+                        <Button color="secondary"
                                 size="lg"
                                 onClick={(e) => this.onChartModeBtnClick(ChartMode.CRI)}
                                 active={this.state.chartMode === ChartMode.CRI}>CRI</Button>
-                        <Button color="primary"
+                        <Button color="secondary"
                                 size="lg"
                                 onClick={(e) => this.onChartModeBtnClick(ChartMode.SI)}
                                 active={this.state.chartMode === ChartMode.SI}>SI</Button>
-                        <Button color="primary"
+                        <Button color="secondary"
                                 size="lg"
                                 onClick={(e) => this.onChartModeBtnClick(ChartMode.SSI)}
                                 active={this.state.chartMode === ChartMode.SSI}>SSI</Button>
@@ -89,14 +89,15 @@ export default class Chart extends Component {
                 <div className="schedule-chart">
                     <FlexibleWidthXYPlot
                         height={1000}
-                        margin={{left: 100, right: 50}}
+                        margin={{left: 300, right: 50}}
                         yType="ordinal"
+                        color="grey"
                         className="chart-histogram">
                         <HorizontalGridLines/>
                         <VerticalGridLines/>
                         <HorizontalBarSeries data={data}/>
                         <YAxis/>
-                        <XAxis/>
+                        <XAxis  tickValues={[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]}/>
                     </FlexibleWidthXYPlot>
                 </div>
 
@@ -109,7 +110,7 @@ export default class Chart extends Component {
         const {durationMean, durationDevi, durationMax, durationMin, data} = this.state.histogramData
         return (
             <div className="histogram-container">
-                <h1 className="histogram-title">Duration Histogram</h1>
+                <h4 className="histogram-title">Duration Histogram</h4>
                 <table className="histogram-summary-table">
                     <thead>
                     <tr>
@@ -132,6 +133,7 @@ export default class Chart extends Component {
                     className="chart-histogram"
                     xType="ordinal"
                     height={300}
+                    color="grey"
                     margin={{left: 50}}>
                     <VerticalGridLines/>
                     <HorizontalGridLines/>
@@ -146,9 +148,35 @@ export default class Chart extends Component {
     render() {
         return (
             this.state.initialized &&
-            <div>
-                {this.renderDurationHistogram()}
-                {this.renderScheduleHistogram()}
+            <div className="container-fluid">
+                <div className="row">
+                    <div className="col-sm-12">
+                        <table className="project-summary-table">
+                            <thead>
+                            <tr>
+                                <th>Project Name</th>
+                                <th>Simulation</th>
+                                <th>Work</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td><b>Temp Project</b></td>
+                                <td>TODO</td>
+                                <td>TODO</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-sm-4">
+                        {this.renderDurationHistogram()}
+                    </div>
+                    <div className="col-sm-8">
+                        {this.renderScheduleHistogram()}
+                    </div>
+                </div>
             </div>
         )
     }
