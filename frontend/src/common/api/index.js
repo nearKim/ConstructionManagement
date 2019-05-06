@@ -391,3 +391,12 @@ export function createAllocations(activities, dataId, isProductivity, mode) {
 export function finishAllocations() {
     return fetch(`${API_V1_ENDPOINT}/allocations/finish/`)
 }
+
+
+/**
+ * Statistics API
+ */
+
+export function getHistogramData() {
+    return fetch(`${API_V1_ENDPOINT}/histogram/`)
+}
