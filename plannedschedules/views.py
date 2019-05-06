@@ -47,8 +47,7 @@ class ScheduleChartView(views.APIView):
         if settings.DEBUG:
             return Response(status=HTTP_403_FORBIDDEN, data='You are in DEBUG mode')
         try:
-            # df = pd.read_csv(os.path.join(settings.OUTPUT_DIR, 'scheduleUI-1.csv'))
-            df = pd.read_csv('/Users/nearkim/Downloads/scheduleUI-1.csv')
+            df = pd.read_csv(os.path.join(settings.OUTPUT_DIR, 'scheduleUI-1.csv'))
 
             # Header에 있는 space를 제거한다
             df.rename(columns=lambda x: x.strip(), inplace=True)
