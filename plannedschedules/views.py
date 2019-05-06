@@ -47,13 +47,20 @@ class ScheduleChartView(views.APIView):
         if not settings.DEBUG:
             return Response(status=HTTP_403_FORBIDDEN, data='You are in DEBUG mode')
         try:
-            df = pd.read_csv(os.path.join(settings.OUTPUT_DIR, 'scheduleUI-1.csv'))
+            # df = pd.read_csv(os.path.join(settings.OUTPUT_DIR, 'scheduleUI-1.csv'))
+            df = pd.read_csv('/Users/nearkim/Downloads/scheduleUI-1.csv')
 
             # Header에 있는 space를 제거한다
             df.rename(columns=lambda x: x.strip(), inplace=True)
             # Index전환
             df.set_index('activityID', inplace=True)
-            return Response(status=HTTP_200_OK, data=df[['CI', 'SI', 'SSI', 'CRI']].to_dict())
+            data_dict = df[['CI', 'SI', 'SSI', 'CRI']].to_dict()
+
+            return Response(status=HTTP_200_OK,
+                            data={
+                                mode: [{'x': v, 'y': k} for k, v in data.items()]
+                                for mode, data in data_dict.items()
+                            })
         except FileNotFoundError:
             return Response(status=HTTP_500_INTERNAL_SERVER_ERROR, data='scheduleUI-1.csv does not exists')
 
