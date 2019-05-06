@@ -9,6 +9,9 @@ export default class NavBar extends Component {
                     <NavbarBrand href="/" className="mr-auto">Construction Management</NavbarBrand>
                     <Nav>
                         <NavItem>
+                            <NavLink href="/chart/">Visualization</NavLink>
+                        </NavItem>
+                        <NavItem>
                             <NavLink href="/planned-schedule/">Planned Schedule management</NavLink>
                         </NavItem>
                     </Nav>
