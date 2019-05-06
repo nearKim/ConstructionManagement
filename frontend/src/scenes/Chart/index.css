@@ -1,0 +1,32 @@
+table {
+    text-align: center;
+    width: 90%;
+    margin: auto;
+    border: 1px solid;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid;
+    padding: 10px;
+}
+
+.project-summary-table {
+    table-layout: fixed;
+    margin-bottom: 50px;
+    margin-top: 50px;
+}
+
+.histogram-summary-table {
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.histogram-title {
+    margin: 20px;
+    text-align: center;
+}
+
+.chart-mode-btn-container {
+    text-align: center;
+}

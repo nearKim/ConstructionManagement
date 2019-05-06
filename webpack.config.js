@@ -5,7 +5,8 @@ const BundleTracker = require('webpack-bundle-tracker')
 module.exports = {
     entry: {
         main: './frontend/src/frontend.app.js',
-        plannedSchedule: './frontend/src/planned_schedule.app.js'
+        plannedSchedule: './frontend/src/planned_schedule.app.js',
+        chart: './frontend/src/chart.app.js'
     },
     output: {
         path: path.resolve(__dirname, 'frontend', 'static', 'frontend'),

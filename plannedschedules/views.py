@@ -5,7 +5,7 @@ from django.conf import settings
 import pandas as pd
 from django.core.files.base import ContentFile
 from copy import deepcopy
-from django.core.files.storage import default_storage
+from collections import Counter
 from django.db import IntegrityError
 from django.db.models import Case, When, BooleanField
 from rest_framework.decorators import action
@@ -16,6 +16,53 @@ from ConstructionManagement.helper import batch_create_workpackages
 from plannedschedules.serializers import *
 
 from rest_framework import views, viewsets, status
+
+
+class HistogramView(views.APIView):
+    def get(self, request, format=None):
+        # Debug가 True이면 403을 반환한다
+        if not settings.DEBUG:
+            return Response(status=HTTP_403_FORBIDDEN, data='You are in DEBUG mode')
+        try:
+            result = {}
+            with open(os.path.join(settings.OUTPUT_DIR, 'scheduleUI-2.csv'), 'r') as f:
+                data = []
+                for line in f.readlines():
+                    # 파싱한 string이 정수가 아니면 요약통계량을 파싱해야 한다
+                    if not line.strip().isdigit():
+                        k, v = line.strip().split(',')
+                        result[k] = v
+                    else:
+                        data.append(float(line.strip()))
+                result['data'] = [{'x': k, 'y': v} for k, v in dict(Counter(data)).items()]
+            return Response(status=HTTP_200_OK, data=result)
+
+        except FileNotFoundError:
+            return Response(status=HTTP_500_INTERNAL_SERVER_ERROR, data='scheduleUI-2.csv does not exists')
+
+
+class ScheduleChartView(views.APIView):
+    def get(self, request, format=None):
+        # Debug가 True이면 403을 반환한다
+        if not settings.DEBUG:
+            return Response(status=HTTP_403_FORBIDDEN, data='You are in DEBUG mode')
+        try:
+            # df = pd.read_csv(os.path.join(settings.OUTPUT_DIR, 'scheduleUI-1.csv'))
+            df = pd.read_csv('/Users/nearkim/Downloads/scheduleUI-1.csv')
+
+            # Header에 있는 space를 제거한다
+            df.rename(columns=lambda x: x.strip(), inplace=True)
+            # Index전환
+            df.set_index('activityID', inplace=True)
+            data_dict = df[['CI', 'SI', 'SSI', 'CRI']].to_dict()
+
+            return Response(status=HTTP_200_OK,
+                            data={
+                                mode: [{'x': v, 'y': k} for k, v in data.items()]
+                                for mode, data in data_dict.items()
+                            })
+        except FileNotFoundError:
+            return Response(status=HTTP_500_INTERNAL_SERVER_ERROR, data='scheduleUI-1.csv does not exists')
 
 
 class AllocationFinishView(views.APIView):
@@ -35,7 +82,8 @@ class AllocationFinishView(views.APIView):
             })
 
             # Activity, DataInfo를 조합하여 원하는 dataframe을 만든 후
-            activities = list(Activity.objects.all().values('activity_id', 'project_id', 'duration', 'productivity', 'data_id'))
+            activities = list(
+                Activity.objects.all().values('activity_id', 'project_id', 'duration', 'productivity', 'data_id'))
             activity_df = pd.DataFrame(activities)
 
             datas = list(DataInfo.objects.annotate(
