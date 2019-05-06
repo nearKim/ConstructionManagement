@@ -34,7 +34,7 @@ class HistogramView(views.APIView):
                         result[k] = v
                     else:
                         data.append(float(line.strip()))
-                result.update(dict(Counter(data)))
+                result['histo_data'] = [{'x': k, 'y': v} for k, v in dict(Counter(data)).items()]
             return Response(status=HTTP_200_OK, data=result)
 
         except FileNotFoundError:
