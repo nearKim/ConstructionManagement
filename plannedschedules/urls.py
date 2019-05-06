@@ -11,6 +11,7 @@ router.register(r'allocations', views.AllocationViewSet, basename='planned')
 urlpatterns = [
     # csv-import가 반드시 먼저 와야 한다
     path('histogram/', views.HistogramView.as_view()),
+    path('schedule-chart/', views.ScheduleChartView.as_view()),
     path('planned-schedules/csv-import/', views.PlannedScheduleCSVimportAPIView.as_view()),
     path('allocations/finish/', views.AllocationFinishView.as_view()),
     path('', include(router.urls)),

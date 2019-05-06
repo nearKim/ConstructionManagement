@@ -41,6 +41,23 @@ class HistogramView(views.APIView):
             return Response(status=HTTP_500_INTERNAL_SERVER_ERROR, data='scheduleUI-2.csv does not exists')
 
 
+class ScheduleChartView(views.APIView):
+    def get(self, request, format=None):
+        # Debug가 True이면 403을 반환한다
+        if not settings.DEBUG:
+            return Response(status=HTTP_403_FORBIDDEN, data='You are in DEBUG mode')
+        try:
+            df = pd.read_csv(os.path.join(settings.OUTPUT_DIR, 'scheduleUI-1.csv'))
+
+            # Header에 있는 space를 제거한다
+            df.rename(columns=lambda x: x.strip(), inplace=True)
+            # Index전환
+            df.set_index('activityID', inplace=True)
+            return Response(status=HTTP_200_OK, data=df[['CI', 'SI', 'SSI', 'CRI']].to_dict())
+        except FileNotFoundError:
+            return Response(status=HTTP_500_INTERNAL_SERVER_ERROR, data='scheduleUI-1.csv does not exists')
+
+
 class AllocationFinishView(views.APIView):
     def get(self, request, format=None):
         # Debug가 True이면 403을 반환한다
