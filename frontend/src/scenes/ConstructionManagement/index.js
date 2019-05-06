@@ -314,7 +314,6 @@ export default class ConstructionManagement extends Component {
     }
 
     renderResources() {
-        const resources = this.state.resources.map(({resource_id, name}) => ({resource_id, name}))
         return (
             <div id="resource-container" className="col-sm-6 text-center">
                 <Button outline block
@@ -323,7 +322,7 @@ export default class ConstructionManagement extends Component {
                 </Button>
                 {/* Resource List */}
                 <Table selectable={false}
-                       data={convertData4BootstrapTable(resources)}/>
+                       data={convertData4BootstrapTable(this.state.resources)}/>
             </div>
         )
     }
