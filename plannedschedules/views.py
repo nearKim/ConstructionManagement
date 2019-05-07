@@ -320,3 +320,8 @@ class AllocationViewSet(viewsets.ModelViewSet):
         # 결과를 직렬화하여 던져준다
         serializer = AllocationSerializer(allocations, many=True)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['DELETE'])
+    def delete(self, request):
+        Allocation.objects.all().delete()
+        return Response(HTTP_200_OK)
