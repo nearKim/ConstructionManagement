@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, detail_route
 from rest_framework.response import Response
-from rest_framework.status import HTTP_207_MULTI_STATUS, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND, HTTP_200_OK
+from rest_framework.status import HTTP_207_MULTI_STATUS, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR, HTTP_200_OK
 
 from ConstructionManagement.constants import InfoType
 from ConstructionManagement.helper import batch_create_workpackages, generate_data_id
@@ -68,7 +68,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['DELETE'])
     def delete(self, request):
-        Activity.objects.all().delete()
+        Activity.objects.filter(data=None).delete()
         return Response(HTTP_200_OK)
 
     @action(detail=True, methods=['GET'])

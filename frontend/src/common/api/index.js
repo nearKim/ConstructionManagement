@@ -415,3 +415,12 @@ export function getHistogramData() {
 export function getScheduleChartData() {
     return fetch(`${API_V1_ENDPOINT}/schedule-chart/`)
 }
+
+/**
+ * TRUNCATE DATABASE!!!
+ */
+export function truncateDatabase() {
+    return fetch(`eliminate/`, {
+        method: 'DELETE'
+    })
+}
