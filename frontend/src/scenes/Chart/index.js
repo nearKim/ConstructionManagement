@@ -63,6 +63,10 @@ export default class Chart extends Component {
                 data = SSI
                 break
         }
+
+        // x값 기준으로 정렬한다.
+        data.sort((a,b) => (a.x > b.x) ? 1 : ((a.x < b.x) ? -1 : 0 ))
+
         return (
             <div className="schedule-chart-container">
                 <h1 className="chart-title"></h1>
