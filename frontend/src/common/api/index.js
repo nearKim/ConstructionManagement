@@ -91,6 +91,12 @@ export function editActivity(activityId, editData) {
     })
 }
 
+export function deleteActivities() {
+    return fetch(`${API_V1_ENDPOINT}/activities/delete/`, {
+        method: 'DELETE'
+    })
+}
+
 export function deleteActivity(activityId) {
     return fetch(`${API_V1_ENDPOINT}/activities/${activityId}/`, {
         method: 'DELETE'

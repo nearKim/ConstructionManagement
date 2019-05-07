@@ -1,6 +1,6 @@
 import React, {Component, ReactPropTypes} from 'react';
 import './index.css';
-import {Button, ButtonGroup} from 'reactstrap';
+import {Button, ButtonGroup, Col, FormGroup, Input} from 'reactstrap';
 import filterFactory, {textFilter} from 'react-bootstrap-table2-filter';
 import * as api from '../../common/api';
 import Table from "../../components/Table";
@@ -8,6 +8,7 @@ import NavBar from "../../components/NavBar";
 import CustomModal from "../../components/CustomModal";
 import {InformationType, ModalType} from "../../common/constants";
 import {convertData4BootstrapTable, pop} from "../../common/utils";
+import Label from "reactstrap/es/Label";
 
 export default class ConstructionManagement extends Component {
     constructor(props) {
@@ -29,6 +30,7 @@ export default class ConstructionManagement extends Component {
                 selectedDurationInfos: [],
                 selectedProductivityInfos: [],
             },
+            showDanglingActivities: false
         }
 
         this.toggleModal = this.toggleModal.bind(this)
@@ -67,6 +69,22 @@ export default class ConstructionManagement extends Component {
 
     toggleResources() {
         this.setState(prevState => ({showResources: !prevState.showResources}))
+    }
+
+    onCheckBoxClick() {
+        this.setState(prevState => ({showDanglingActivities: !prevState.showDanglingActivities}))
+    }
+
+    deleteActivities() {
+        if (confirm('정말 모든 Activity들을 삭제하시겠습니까?')) {
+            api.deleteActivities().then(res => {
+                if(res.ok) {
+                    alert('성공적으로 삭제되었습니다.')
+                    location.reload()
+                }
+                else alert('에러가 발생하였습니다.')
+            })
+        }
     }
 
     /* Modal Methods */
@@ -363,6 +381,9 @@ export default class ConstructionManagement extends Component {
                 modalTitle = 'Activity CSV import'
                 break
         }
+
+        // 체크박스 여부에 따라 data가 없는 activity만 보여준다.
+        let activities = this.state.showDanglingActivities ? this.state.activities.filter(a => !a.data) : this.state.activities
         return (
             this.state.initialized ?
                 <div>
@@ -383,16 +404,31 @@ export default class ConstructionManagement extends Component {
                     </div>
                     <div className="row">
                         <div id="activity-container" className="col-sm-12">
+                            {/* Activity List */}
                             <Button outline
                                     color="secondary"
                                     onClick={() => this.showModal(ModalType.ACTIVITY)}>Import activities
                             </Button>
-                            {/* Activity List */}
+                            <Button color="warning"
+                                    onClick={() => this.deleteActivities()}>Truncate activities
+                            </Button>
+                            <Col sm={{size: 12}}>
+                                <FormGroup check>
+                                    <Label check>
+                                        <Input type="checkbox"
+                                               id="dangling"
+                                               defaultChecked={this.state.showDanglingActivities}
+                                               onChange={() => this.onCheckBoxClick()}/>{' '}
+                                        Show only dangling activities
+                                    </Label>
+                                </FormGroup>
+                            </Col>
+                            <br/>
                             <Table selectable={true}
                                    filter={textFilter({placeholder: ' '})}
                                    selected={this.state.selected.selectedActivities}
                                    rowSelectHandler={(row, isSelected, rowIndex, e) => this.onActivityRowSelect(row, isSelected, rowIndex, e)}
-                                   data={convertData4BootstrapTable(this.state.activities)}/>
+                                   data={convertData4BootstrapTable(activities)}/>
                         </div>
                         {this.renderMainBtnContainer()}
                         <div className="row">
