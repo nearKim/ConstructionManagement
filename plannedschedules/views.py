@@ -122,7 +122,6 @@ class AllocationFinishView(views.APIView):
                                 status=HTTP_500_INTERNAL_SERVER_ERROR)
 
         except Exception as e:
-            print(e)
             return Response(HTTP_500_INTERNAL_SERVER_ERROR, data=e)
         return Response(HTTP_200_OK)
 
@@ -230,15 +229,12 @@ class PlannedScheduleCSVimportAPIView(views.APIView):
                 if created:
                     result['success'].append(index)
             except IntegrityError as e1:
-                print(e1)
                 status_200 = False
                 result['integrity_error'].append(index)
             except ValueError as e2:
-                print(e2)
                 status_200 = False
                 result['value_error'].append(index)
             except Exception as e:
-                print(e)
                 status_200 = False
                 result['unknown_error'].append(index)
 

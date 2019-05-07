@@ -233,7 +233,6 @@ class ActivityViewSet(viewsets.ModelViewSet):
                 status_200 = False
                 result['value_error'].append(index)
             except Exception as e:
-                print(e)
                 status_200 = False
                 result['unknown_error'].append(index)
 
