@@ -394,6 +394,12 @@ export function createAllocations(activities, dataId, isProductivity, mode) {
     })
 }
 
+export function deleteAllocations() {
+    return fetch(`${API_V1_ENDPOINT}/allocations/delete/`, {
+        method: 'DELETE'
+    })
+}
+
 export function finishAllocations() {
     return fetch(`${API_V1_ENDPOINT}/allocations/finish/`)
 }
