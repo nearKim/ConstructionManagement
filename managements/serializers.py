@@ -3,12 +3,6 @@ from rest_framework import serializers
 from .models import *
 
 
-class ProjectBaseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Project
-        fields = '__all__'
-
-
 class ActivityBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
@@ -24,23 +18,7 @@ class WorkPackageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ResourceBaseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Resource
-        fields = '__all__'
-
-
-class ResourceCreateUpdateSerializer(ResourceBaseSerializer):
-    work_package = serializers.PrimaryKeyRelatedField(many=True, queryset=WorkPackage.objects.all())
-
-
-class ResourceRetrieveListSerializer(ResourceBaseSerializer):
-    work_package = WorkPackageSerializer(many=True, read_only=True)
-
-
 class ActivityCreateUpdateSerializer(ActivityBaseSerializer):
-    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all())
-    resource = serializers.PrimaryKeyRelatedField(queryset=Resource.objects.all(), required=False)
     work_package = serializers.PrimaryKeyRelatedField(many=True, queryset=WorkPackage.objects.all())
 
     def validate(self, attrs):
@@ -62,5 +40,4 @@ class ActivityCreateUpdateSerializer(ActivityBaseSerializer):
 
 class ActivityRetrieveListSerializer(ActivityBaseSerializer):
     project = serializers.PrimaryKeyRelatedField(read_only=True)
-    resource = ResourceRetrieveListSerializer(read_only=True)
     work_package = WorkPackageSerializer(many=True, read_only=True)
