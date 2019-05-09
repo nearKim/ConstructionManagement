@@ -9,10 +9,7 @@ class PlannedSchedules(TimeStampedMixin):
     wbs_id = models.CharField(_('WBS Id'), max_length=300)
     name = models.CharField(_('액티비티 이름'), max_length=300)
     duration = models.PositiveIntegerField(_('기간'), default=0)
-    resource = models.ForeignKey('managements.Resource',
-                                 null=True,
-                                 related_name='planned_schedules',
-                                 on_delete=models.SET_NULL)
+    resource = models.CharField(_('리소스'), null=True, max_length=300)
     work_package = models.ManyToManyField('managements.WorkPackage', related_name='planned_schedules')
     quantity = models.IntegerField(_('물량'), default=0, null=True, blank=True)
     data = models.ForeignKey('informations.DataInfo',

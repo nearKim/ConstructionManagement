@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import './index.css';
-import {Button, FormGroup, Label, Input, Col} from 'reactstrap'
+import {Button, FormGroup, Label, Input, Col, Row} from 'reactstrap'
 import * as api from '../../common/api';
 
 import {ModalType} from "../../common/constants";
@@ -10,6 +10,7 @@ import CustomModal from "../../components/CustomModal";
 
 import {textFilter} from "react-bootstrap-table2-filter";
 import {convertData4BootstrapTable, pop} from "../../common/utils";
+import Form from "reactstrap/es/Form";
 
 export default class PlannedScheduleManagement extends Component {
     constructor(props) {
@@ -41,7 +42,7 @@ export default class PlannedScheduleManagement extends Component {
 
     componentDidMount() {
         Promise.all([
-                api.getResources(),
+                // api.getResources(),
                 api.getPlannedSchedules(),
                 api.getDurationInfos(),
                 api.getProductivityInfos(),
@@ -51,15 +52,12 @@ export default class PlannedScheduleManagement extends Component {
         ).then(res => {
             this.setState({
                 initialized: true,
-                resources: res[0],
+                // resources: res[0],
                 // resource는 convert4Bootstrap에서 없어진다.
                 // resource 어트리뷰트의 이름을 resourceId로 바꿔준다.
-                plannedSchedules: res[1].map(ps => ({
-                    ...ps,
-                    resourceId: ps.resource
-                })).map(({resource, ...attrs}) => attrs),
-                dataInfos: [...res[2], ...res[3]],
-                allocations: res[4]
+                plannedSchedules: res[0],
+                dataInfos: [...res[1], ...res[2]],
+                allocations: res[3]
             })
         })
     }
@@ -221,74 +219,60 @@ export default class PlannedScheduleManagement extends Component {
         })
     }
 
-
-    renderResources() {
-        return (
-            <div className="row">
-                <div id="resource-container" className="col-sm-4 text-center">
-                    <Button outline block
-                            color="primary"
-                            onClick={() => this.showModal()}>Import resources</Button>
-                    {/* Resource List */}
-                    <Table selectable={false}
-                           data={convertData4BootstrapTable(this.state.resources)}/>
-                </div>
-                <div id="csv-import-container" className="col-sm-8 text-center">
-                    <FormGroup row>
-                        <Label for="schedule-input" sm={2}>Planned Schedules</Label>
-                        <Col sm={10}>
-                            <Input id="schedule-input"
-                                   type="file"
-                                   name="plannedActivityFile"
-                                   onChange={(e) => this.onFileInputChange(e)}
-                            />
+    renderInputs() {
+        return(
+            <Row form className="input-container">
+                        <Col sm={2}>
+                            <FormGroup>
+                                <Label for="schedule-input">Planned Schedules</Label>
+                                <Input id="schedule-input"
+                                       type="file"
+                                       name="plannedActivityFile"
+                                       onChange={(e) => this.onFileInputChange(e)}
+                                />
+                            </FormGroup>
                         </Col>
-                        <Label for="activity-resource-input" sm={2}>Activity-resource</Label>
-                        <Col sm={10}>
-                            <Input id="activity-resource-input"
-                                   type="file"
-                                   name="activityResourceFile"
-                                   onChange={(e) => this.onFileInputChange(e)}
-                            />
+                        <Col sm={2}>
+                            <FormGroup>
+                                <Label for="activity-resource-input">Activity-resource</Label>
+                                <Input id="activity-resource-input"
+                                       type="file"
+                                       name="activityResourceFile"
+                                       onChange={(e) => this.onFileInputChange(e)}
+                                />
+                            </FormGroup>
                         </Col>
-                        <Label for="dependency-input" sm={2}>Dependency</Label>
-                        <Col sm={10}>
-                            <Input id="dependency-input"
-                                   type="file"
-                                   name="dependencyFile"
-                                   onChange={(e) => this.onFileInputChange(e)}
-                            />
+                        <Col sm={2}>
+                            <FormGroup>
+                                <Label for="dependency-input">Dependency</Label>
+                                <Input id="dependency-input"
+                                       type="file"
+                                       name="dependencyFile"
+                                       onChange={(e) => this.onFileInputChange(e)}
+                                />
+                            </FormGroup>
                         </Col>
-                        <Label for="resource-input" sm={2}>Resource</Label>
-                        <Col sm={10}>
-                            <Input id="resource-input"
-                                   type="file"
-                                   name="resourceFile"
-                                   onChange={(e) => this.onFileInputChange(e)}
-                            />
+                        <Col sm={2}>
+                            <FormGroup>
+                                <Label for="resource-input">Resource</Label>
+                                <Input id="resource-input"
+                                       type="file"
+                                       name="resourceFile"
+                                       onChange={(e) => this.onFileInputChange(e)}
+                                />
+                            </FormGroup>
                         </Col>
-                        <Button className="btn-block" onClick={(e) => this.onFileSubmit(e)}>Submit</Button>
-                    </FormGroup>
-                </div>
-            </div>
+                    <Col sm={2}>
+                        <Button color="secondary btn-block" onClick={(e) => this.onFileSubmit(e)}>Submit</Button>
+                    </Col>
+                </Row>
         )
     }
 
-    render() {
+    renderLinkStatusContainer() {
         let {selectedSchedules, selectedDatas} = this.state.selected
-        return (
-            <div className="container-fluid">
-                <NavBar/>
-                <div className="row">
-                    <div className="col-sm-12">
-                        <Button outline
-                                id="toggle-resource-btn"
-                                className="btn-block"
-                                color="secondary"
-                                onClick={() => this.toggleResources()}>Toggle Resources and File Inputs</Button>
-                    </div>
-                </div>
-                {this.state.showResources && this.renderResources()}
+        return(
+            <div>
                 <div id="link-status-container" className="row text-center">
                     <div id="link-planned-schedules-container" className="col-sm-4">
                         <h3>Selected As-built schedules</h3>
@@ -321,7 +305,18 @@ export default class PlannedScheduleManagement extends Component {
                                 onClick={(e) => this.createAllocation(e)}>Link Activity</Button>
                     </div>
                 </div>
+            </div>
+        )
+    }
 
+
+    render() {
+        let {selectedSchedules, selectedDatas} = this.state.selected
+        return (
+            <div className="container-fluid">
+                <NavBar/>
+                {this.renderInputs()}
+                {this.renderLinkStatusContainer()}
                 <div className="row text-center">
                     <div className="col-sm-6">
                         <span className="table-title">Planned Schedules</span>
