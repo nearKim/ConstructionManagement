@@ -129,6 +129,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
                 return Response(status=HTTP_400_BAD_REQUEST,
                                 data='DurationInfo cannot be updated with Productivity type.')
 
+
             # activity의 data 정보 업데이트
             activity.data = data
             activity.save()
@@ -217,13 +218,14 @@ class ActivityViewSet(viewsets.ModelViewSet):
                     result['success'].append(index)
 
             except IntegrityError as e1:
+                # work package가 null일 경우
                 status_200 = False
                 result['integrity_error'].append(index)
             except ValueError as e2:
+                # Nan 등이 들어온 경우
                 status_200 = False
                 result['value_error'].append(index)
             except Exception as e:
-                print(e)
                 status_200 = False
                 result['unknown_error'].append(index)
 
