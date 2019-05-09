@@ -41,7 +41,7 @@ export default class PlannedScheduleManagement extends Component {
 
     componentDidMount() {
         Promise.all([
-                api.getResources(),
+                // api.getResources(),
                 api.getPlannedSchedules(),
                 api.getDurationInfos(),
                 api.getProductivityInfos(),
@@ -51,15 +51,12 @@ export default class PlannedScheduleManagement extends Component {
         ).then(res => {
             this.setState({
                 initialized: true,
-                resources: res[0],
+                // resources: res[0],
                 // resource는 convert4Bootstrap에서 없어진다.
                 // resource 어트리뷰트의 이름을 resourceId로 바꿔준다.
-                plannedSchedules: res[1].map(ps => ({
-                    ...ps,
-                    resourceId: ps.resource
-                })).map(({resource, ...attrs}) => attrs),
-                dataInfos: [...res[2], ...res[3]],
-                allocations: res[4]
+                plannedSchedules: res[0],
+                dataInfos: [...res[1], ...res[2]],
+                allocations: res[3]
             })
         })
     }

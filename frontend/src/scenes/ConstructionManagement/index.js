@@ -41,8 +41,8 @@ export default class ConstructionManagement extends Component {
         // 모든 데이터를 초기화한다
         Promise.all(
             [
-                api.getProjects(),
-                api.getResources(),
+                // api.getProjects(),
+                // api.getResources(),
                 api.getActivities(),
                 api.getWorkPackages(),
                 api.getDurationInfos(),
@@ -52,12 +52,12 @@ export default class ConstructionManagement extends Component {
         ).then(res => {
                 this.setState({
                     initialized: true,
-                    projects: res[0],
-                    resources: res[1],
-                    activities: res[2],
-                    workPackages: res[3],
-                    durationInfos: res[4],
-                    productivityInfos: res[5]
+                    // projects: res[0],
+                    // resources: res[1],
+                    activities: res[0],
+                    workPackages: res[1],
+                    durationInfos: res[2],
+                    productivityInfos: res[3]
                 })
             }
         )
