@@ -41,8 +41,8 @@ export default class ConstructionManagement extends Component {
         // 모든 데이터를 초기화한다
         Promise.all(
             [
-                api.getProjects(),
-                api.getResources(),
+                // api.getProjects(),
+                // api.getResources(),
                 api.getActivities(),
                 api.getWorkPackages(),
                 api.getDurationInfos(),
@@ -52,12 +52,12 @@ export default class ConstructionManagement extends Component {
         ).then(res => {
                 this.setState({
                     initialized: true,
-                    projects: res[0],
-                    resources: res[1],
-                    activities: res[2],
-                    workPackages: res[3],
-                    durationInfos: res[4],
-                    productivityInfos: res[5]
+                    // projects: res[0],
+                    // resources: res[1],
+                    activities: res[0],
+                    workPackages: res[1],
+                    durationInfos: res[2],
+                    productivityInfos: res[3]
                 })
             }
         )
@@ -318,33 +318,6 @@ export default class ConstructionManagement extends Component {
                 )
     }
 
-    renderProjects() {
-        return (
-            <div id="project-container" className="col-sm-6 text-center">
-                <Button outline block
-                        color="primary"
-                        onClick={() => this.showModal(ModalType.PROJECT)}>Add project</Button>
-                {/* Project List */}
-                <Table selectable={false}
-                       data={convertData4BootstrapTable(this.state.projects)}/>
-            </div>
-        )
-    }
-
-    renderResources() {
-        return (
-            <div id="resource-container" className="col-sm-6 text-center">
-                <Button outline block
-                        color="primary"
-                        onClick={() => this.showModal(ModalType.RESOURCE)}>Import resources
-                </Button>
-                {/* Resource List */}
-                <Table selectable={false}
-                       data={convertData4BootstrapTable(this.state.resources)}/>
-            </div>
-        )
-    }
-
     renderMainBtnContainer() {
         return (
             <div className="row">
@@ -388,20 +361,6 @@ export default class ConstructionManagement extends Component {
             this.state.initialized ?
                 <div>
                     <NavBar/>
-                    <div className="row">
-                        <div className="col-sm-12 text-center">
-                            <Button outline
-                                    color="secondary"
-                                    onClick={() => this.toggleProjects()}>Toggle projects</Button>
-                            <Button outline
-                                    color="secondary"
-                                    onClick={() => this.toggleResources()}>Toggle Resources</Button>
-                        </div>
-                    </div>
-                    <div className="row">
-                        {this.state.showProjects && this.renderProjects()}
-                        {this.state.showResources && this.renderResources()}
-                    </div>
                     <div className="row">
                         <div id="activity-container" className="col-sm-12">
                             {/* Activity List */}

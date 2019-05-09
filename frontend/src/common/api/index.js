@@ -420,7 +420,7 @@ export function getScheduleChartData() {
  * TRUNCATE DATABASE!!!
  */
 export function truncateDatabase() {
-    return fetch(`eliminate/`, {
+    return fetch(`/eliminate/`, {
         method: 'DELETE'
     })
 }

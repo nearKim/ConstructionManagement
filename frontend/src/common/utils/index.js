@@ -57,9 +57,9 @@ export function convertData4BootstrapTable(dataArr) {
         }
 
         // Activity인 경우 resource를 name으로 바꿔넣어준다
-        if (data['resource']) {
-            data['resource'] = data['resource']['name']
-        }
+        // if (data['resource']) {
+        //     data['resource'] = data['resource']['name']
+        // }
 
         return data
     })
