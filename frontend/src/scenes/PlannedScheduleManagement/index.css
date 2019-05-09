@@ -33,3 +33,13 @@
     font-size: larger;
     font-weight: bolder;
 }
+
+#delete-allocations-btn {
+    margin-bottom: 20px;
+}
+
+.input-container {
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-bottom: 60px;
+}
