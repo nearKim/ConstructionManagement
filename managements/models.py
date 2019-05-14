@@ -9,7 +9,7 @@ from informations.models import DataInfo
 class Activity(TimeStampedMixin):
     activity_id = models.CharField(_('액티비티 Id'), max_length=100, primary_key=True)
     name = models.CharField(_('액티비티 이름'), max_length=300)
-    description = models.TextField(_('액티비티 설명'), blank=True)
+    description = models.TextField(_('액티비티 설명'), null=True)
     duration = models.PositiveIntegerField(_('기간'), default=0)
     productivity = models.FloatField(_('생산성'), null=True, blank=True)
     labor_cnt = models.PositiveIntegerField(_('인력 총원'), default=0)
