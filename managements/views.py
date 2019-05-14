@@ -168,7 +168,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
         decoded_file = file.read().decode('utf-8')
         io_string = io.StringIO(decoded_file)
 
-        non_work_packages = ['activityID', 'name', 'description', 'project', 'duration', 'productivity', 'resource',
+        non_work_packages = ['activityID', 'name', 'description', 'projectID', 'duration', 'productivity', 'resourceID',
                              'numofLabour', 'quantity']
 
         df = pd.read_csv(io_string)
@@ -209,8 +209,8 @@ class ActivityViewSet(viewsets.ModelViewSet):
                     quantity=quantity,
                     productivity=productivity,
                     labor_cnt=row['numofLabour'],
-                    project=row['project'],
-                    resource=row['resource'],
+                    project=row['projectID'],
+                    resource=row['resourceID'],
                     data=None
                 )
                 a.work_package.add(*parent_packages, *child_packages)
