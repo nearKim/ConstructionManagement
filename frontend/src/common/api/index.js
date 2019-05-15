@@ -104,7 +104,7 @@ export function deleteActivity(activityId) {
     })
 }
 
-export function makeActivityData(activityId, dataId = '', type, link = '', description = '') {
+export function makeActivityData(activityId, dataId = '', type, link = '', name='', description = '') {
     let query = `?type=${type}&link=${link}`
     return fetch(`${API_V1_ENDPOINT}/activities/${activityId}/information/${dataId}` + query, {
         method: 'POST',
@@ -112,13 +112,15 @@ export function makeActivityData(activityId, dataId = '', type, link = '', descr
             'Accept': 'application/json, text/plain, */*',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({description: description})
+        body: JSON.stringify({name, description})
     })
 }
 
-export function linkActivitiesWithDuration(dataId, activityIds) {
+export function linkActivitiesWithDuration(dataId, activityIds, name, description) {
     let linkData = {
-        activities: activityIds
+        activities: activityIds,
+        name,
+        description
     }
     return fetch(`${API_V1_ENDPOINT}/duration-infos/${dataId}/activities/`, {
         method: 'POST',
@@ -130,9 +132,11 @@ export function linkActivitiesWithDuration(dataId, activityIds) {
     })
 }
 
-export function linkActivitiesWithProductivity(dataId, activityIds) {
+export function linkActivitiesWithProductivity(dataId, activityIds, name, description) {
     let linkData = {
-        activities: activityIds
+        activities: activityIds,
+        name,
+        description
     }
     return fetch(`${API_V1_ENDPOINT}/productivity-infos/${dataId}/activities/`, {
         method: 'POST',

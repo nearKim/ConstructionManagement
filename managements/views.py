@@ -76,6 +76,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
         # Querystring 및 데이터들을 갖고온다
         link = json.loads(request.query_params.get('link', 'false'))
         value_type = request.query_params.get('type', None)
+        name = request.data.get('name', '')
         description = request.data.get('description', '')
 
         # DataInfo의 ID를 지정한다
@@ -95,6 +96,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
                     maximum=activity.productivity,
                     minimum=activity.productivity,
                     use_duration=False,
+                    name=name,
                     description=description
                 )
                 serializer = ProductivityInfoSerializer(data)
@@ -107,6 +109,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
                     maximum=activity.duration,
                     minimum=activity.duration,
                     use_duration=True,
+                    name=name,
                     description=description
                 )
                 serializer = DurationInfoSerializer(data)
