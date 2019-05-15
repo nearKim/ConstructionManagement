@@ -198,17 +198,6 @@ export default class PlannedScheduleManagement extends Component {
 
     }
 
-    deleteAllocations() {
-        if (confirm('정말로 Allocation들을 모두 삭제하시겠습니까?')) {
-            api.deleteAllocations().then(res => {
-                if (res.ok) {
-                    alert('성공적으로 삭제되었습니다.')
-                    location.reload()
-                } else alert('에러가 발생하였습니다.')
-            })
-        }
-    }
-
     confirmAllocation() {
         if (!confirm('정말 배정을 확정하시겠습니까?')) return
         api.finishAllocations().then(res => {
@@ -343,10 +332,7 @@ export default class PlannedScheduleManagement extends Component {
                                 color="success"
                                 className="btn-block"
                                 onClick={() => this.confirmAllocation()}>Confirm Allocation</Button>
-                        <Button id="delete-allocations-btn"
-                                color="warning"
-                                className="btn-block"
-                                onClick={() => this.deleteAllocations()}>Truncate Allocations</Button>
+
                         <div className="data-information-table-container">
                             <span className="table-title">Allocations</span>
                             <Table selectable={false}

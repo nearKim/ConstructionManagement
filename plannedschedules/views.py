@@ -287,6 +287,11 @@ class PlannedScheduleViewSet(viewsets.ModelViewSet):
         serializer = WorkPackageSerializer(work_packages, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['DELETE'])
+    def delete(self, request):
+        PlannedSchedules.objects.all().delete()
+        return Response(HTTP_200_OK)
+
 
 class AllocationViewSet(viewsets.ModelViewSet):
     serializer_class = AllocationSerializer

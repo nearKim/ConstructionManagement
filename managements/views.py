@@ -76,6 +76,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
         # Querystring 및 데이터들을 갖고온다
         link = json.loads(request.query_params.get('link', 'false'))
         value_type = request.query_params.get('type', None)
+        name = request.data.get('name', '')
         description = request.data.get('description', '')
 
         # DataInfo의 ID를 지정한다
@@ -95,6 +96,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
                     maximum=activity.productivity,
                     minimum=activity.productivity,
                     use_duration=False,
+                    name=name,
                     description=description
                 )
                 serializer = ProductivityInfoSerializer(data)
@@ -107,6 +109,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
                     maximum=activity.duration,
                     minimum=activity.duration,
                     use_duration=True,
+                    name=name,
                     description=description
                 )
                 serializer = DurationInfoSerializer(data)
@@ -198,13 +201,14 @@ class ActivityViewSet(viewsets.ModelViewSet):
             try:
                 # quantity가 Null이거나 Nan이라면 명시적으로 None을 넣어준다
                 quantity = None if pd.isnull(row['quantity']) or pd.isna(row['quantity']) else row['quantity']
+                description = None if pd.isnull(row['description']) or pd.isna(row['description']) else row['description']
                 productivity = row['quantity'] / row['duration'] if quantity else None
 
                 # Activity를 생성하면서 대분류, 소분류를 모두 넣어준다.
                 a, created = Activity.objects.update_or_create(
                     activity_id=row['activityID'],
                     name=row['name'],
-                    description=row['description'],
+                    description=description,
                     duration=row['duration'],
                     quantity=quantity,
                     productivity=productivity,

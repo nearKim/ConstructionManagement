@@ -1,6 +1,6 @@
 import React, {Component, ReactPropTypes} from 'react';
 import './index.css';
-import {Button, ButtonGroup, Col, FormGroup, Input} from 'reactstrap';
+import {Button, ButtonGroup, Col, Form, FormGroup, Input} from 'reactstrap';
 import filterFactory, {textFilter} from 'react-bootstrap-table2-filter';
 import * as api from '../../common/api';
 import Table from "../../components/Table";
@@ -9,6 +9,7 @@ import CustomModal from "../../components/CustomModal";
 import {InformationType, ModalType} from "../../common/constants";
 import {convertData4BootstrapTable, pop} from "../../common/utils";
 import Label from "reactstrap/es/Label";
+import InputGroup from "reactstrap/es/InputGroup";
 
 export default class ConstructionManagement extends Component {
     constructor(props) {
@@ -30,7 +31,10 @@ export default class ConstructionManagement extends Component {
                 selectedDurationInfos: [],
                 selectedProductivityInfos: [],
             },
-            showDanglingActivities: false
+            showDanglingActivities: false,
+
+            dataName: '',
+            dataDesc: '',
         }
 
         this.toggleModal = this.toggleModal.bind(this)
@@ -41,8 +45,6 @@ export default class ConstructionManagement extends Component {
         // 모든 데이터를 초기화한다
         Promise.all(
             [
-                // api.getProjects(),
-                // api.getResources(),
                 api.getActivities(),
                 api.getWorkPackages(),
                 api.getDurationInfos(),
@@ -52,8 +54,6 @@ export default class ConstructionManagement extends Component {
         ).then(res => {
                 this.setState({
                     initialized: true,
-                    // projects: res[0],
-                    // resources: res[1],
                     activities: res[0],
                     workPackages: res[1],
                     durationInfos: res[2],
@@ -63,28 +63,14 @@ export default class ConstructionManagement extends Component {
         )
     }
 
-    toggleProjects() {
-        this.setState(prevState => ({showProjects: !prevState.showProjects}))
-    }
-
-    toggleResources() {
-        this.setState(prevState => ({showResources: !prevState.showResources}))
+    onInputChange(e) {
+        this.setState({
+            [e.target.name]: e.target.value
+        })
     }
 
     onCheckBoxClick() {
         this.setState(prevState => ({showDanglingActivities: !prevState.showDanglingActivities}))
-    }
-
-    deleteActivities() {
-        if (confirm('정말 모든 Activity들을 삭제하시겠습니까?')) {
-            api.deleteActivities().then(res => {
-                if(res.ok) {
-                    alert('성공적으로 삭제되었습니다.')
-                    location.reload()
-                }
-                else alert('에러가 발생하였습니다.')
-            })
-        }
     }
 
     /* Modal Methods */
@@ -207,7 +193,7 @@ export default class ConstructionManagement extends Component {
 
     // 1개의 선택된 activity를 사용하여 Duration 혹은 Productivity Information을 생성한다
     createInfo(type) {
-        const {activities, selected} = this.state
+        const {activities, selected, dataName, dataDesc} = this.state
         // 단일 information 생성인 경우 activity는 무조건 1개다
         if (this.state.selected.selectedActivities.length !== 1) {
             alert('Activity는 반드시 1개가 선택되어야 합니다.')
@@ -218,10 +204,15 @@ export default class ConstructionManagement extends Component {
 
         if (activity.data) {
             alert('선택한 Activity로 만들어진 Information이 존재합니다. 다른 Activity를 선택하세요')
-            return;
+            return
         }
 
-        api.makeActivityData(activity['activity_id'], undefined, type, false, activity['description'])
+        if (!dataName) {
+            alert('Data Name을 작성해주세요')
+            return
+        }
+
+        api.makeActivityData(activity['activity_id'], undefined, type, false, dataName, dataDesc)
             .then(res => {
                 // 잘 생성된 경우 activity selection을 초기화하고 durationInfo를 업데이트 한다.
                 if (res.status === 200) {
@@ -242,7 +233,9 @@ export default class ConstructionManagement extends Component {
                             },
                             activities: activities,
                             durationInfos: type === InformationType.DURATION ? [...prevState.durationInfos, res] : prevState.durationInfos,
-                            productivityInfos: type === InformationType.PRODUCTIVITY ? [...prevState.productivityInfos, res] : prevState.productivityInfos
+                            productivityInfos: type === InformationType.PRODUCTIVITY ? [...prevState.productivityInfos, res] : prevState.productivityInfos,
+                            dataName: '',
+                            dataDesc: ''
                         }))
                     )
             })
@@ -252,7 +245,7 @@ export default class ConstructionManagement extends Component {
     // TODO: Link하려는 Work package들이 다르면 에러를 발생시킨다
     linkInfo() {
         let {selectedActivities, selectedDurationInfos, selectedProductivityInfos} = this.state.selected
-        let {productivityInfos, durationInfos} = this.state
+        let {productivityInfos, durationInfos, dataName, dataDesc} = this.state
         // 갯수 예외처리
         if (selectedDurationInfos.length !== 1 && selectedProductivityInfos.length !== 1) {
             alert('Information은 반드시 1개가 선택되어야 합니다.')
@@ -263,13 +256,18 @@ export default class ConstructionManagement extends Component {
             return
         }
 
+        if (!dataName) {
+            alert('dataName이 없습니다.')
+            return
+        }
+
         let dataId = selectedDurationInfos[0] || selectedProductivityInfos[0]
         let dataInfo = productivityInfos.concat(durationInfos).find(i => i['data_id'] == dataId)
         let activityIds = selectedActivities
 
         // link 시키고 activity는 빼주고 info는 업데이트 해준다
         dataInfo.use_duration ?
-            api.linkActivitiesWithDuration(dataId, activityIds)
+            api.linkActivitiesWithDuration(dataId, activityIds, dataName, dataDesc)
                 .then(res => {
                     if (res.status === 200) {
                         return res.json()
@@ -288,12 +286,14 @@ export default class ConstructionManagement extends Component {
                                 selectedDurationInfos: []
                             },
                             durationInfos: responses[0],
-                            activities: responses[1]
+                            activities: responses[1],
+                            dataName: '',
+                            dataDesc: ''
                         }))
                     })
                 )
             :
-            api.linkActivitiesWithProductivity(dataId, activityIds)
+            api.linkActivitiesWithProductivity(dataId, activityIds, dataName, dataDesc)
                 .then(res => {
                     if (res.status === 200) {
                         return res.json()
@@ -312,7 +312,9 @@ export default class ConstructionManagement extends Component {
                                 selectedDurationInfos: []
                             },
                             productivityInfos: responses[0],
-                            activities: responses[1]
+                            activities: responses[1],
+                            dataName: '',
+                            dataDesc: ''
                         }))
                     })
                 )
@@ -320,8 +322,8 @@ export default class ConstructionManagement extends Component {
 
     renderMainBtnContainer() {
         return (
-            <div className="row">
-                <div className="col-sm-12 text-center">
+            <div className="row ">
+                <div className="col-sm-8 text-center">
                     <ButtonGroup size="lg">
                         <Button outline
                                 color="success"
@@ -336,6 +338,18 @@ export default class ConstructionManagement extends Component {
                                 onClick={() => this.createInfo(InformationType.PRODUCTIVITY)}>Use productivity
                         </Button>
                     </ButtonGroup>
+                </div>
+                <div className="col-sm-4 text-center">
+                    <Label for="dataName">Data Name: </Label>
+                    <Input id="dataName"
+                           name="dataName"
+                           value={this.state.dataName}
+                           onChange={e => this.onInputChange(e)}/>
+                    <Label for="dataDesc">Data Description: </Label>
+                    <Input id="dataDesc"
+                           name="dataDesc"
+                           value={this.state.dataDesc}
+                           onChange={e => this.onInputChange(e)}/>
                 </div>
             </div>
         )
@@ -367,9 +381,6 @@ export default class ConstructionManagement extends Component {
                             <Button outline
                                     color="secondary"
                                     onClick={() => this.showModal(ModalType.ACTIVITY)}>Import activities
-                            </Button>
-                            <Button color="warning"
-                                    onClick={() => this.deleteActivities()}>Truncate activities
                             </Button>
                             <Col sm={{size: 12}}>
                                 <FormGroup check>
