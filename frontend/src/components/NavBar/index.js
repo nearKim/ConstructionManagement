@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Navbar, NavbarBrand, Nav, NavLink, NavItem} from 'reactstrap'
 import Button from "reactstrap/es/Button";
 import * as api from "../../common/api"
+import ButtonGroup from "reactstrap/es/ButtonGroup";
 
 export default class NavBar extends Component {
 
@@ -19,7 +20,14 @@ export default class NavBar extends Component {
 
     // PlannedSchedule을 밀어버린다
     deletePlannedSchedules() {
-        // TODO
+        if (confirm('정말 모든 Planned Schedule들을 싸그리 없애벌이시겠읍니까?')) {
+            api.deletePlannedSchedules().then(res => {
+                if (res.ok) {
+                    alert('굳')
+                    location.reload()
+                } else alert('ㅠㅠ')
+            })
+        }
     }
 
     // Allocation을 밀어버린다
@@ -60,14 +68,16 @@ export default class NavBar extends Component {
                         <NavItem>
                             <NavLink href="/planned-schedule/">Planned Schedule management</NavLink>
                         </NavItem>
-                        <Button color="warning"
-                                onClick={() => this.deleteActivities()}>Truncate Activities</Button>
-                        <Button color="warning"
-                                onClick={() => this.deletePlannedSchedules()}>Truncate Planned Schedules</Button>
-                        <Button color="warning"
-                                onClick={() => this.deleteAllocations()}>Truncate Allocations</Button>
-                        <Button color="danger"
-                                onClick={() => this.truncateDatabase()}>Flush DB</Button>
+                        <ButtonGroup>
+                            <Button color="warning"
+                                    onClick={() => this.deleteActivities()}>Truncate Activities</Button>
+                            <Button color="warning"
+                                    onClick={() => this.deletePlannedSchedules()}>Truncate Planned Schedules</Button>
+                            <Button color="warning"
+                                    onClick={() => this.deleteAllocations()}>Truncate Allocations</Button>
+                            <Button color="danger"
+                                    onClick={() => this.truncateDatabase()}>Flush DB</Button>
+                        </ButtonGroup>
                     </Nav>
                 </Navbar>
             </div>

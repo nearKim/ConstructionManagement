@@ -104,7 +104,7 @@ export function deleteActivity(activityId) {
     })
 }
 
-export function makeActivityData(activityId, dataId = '', type, link = '', name='', description = '') {
+export function makeActivityData(activityId, dataId = '', type, link = '', name = '', description = '') {
     let query = `?type=${type}&link=${link}`
     return fetch(`${API_V1_ENDPOINT}/activities/${activityId}/information/${dataId}` + query, {
         method: 'POST',
@@ -369,6 +369,12 @@ export function importPlannedScheduleCSV(activityCsvFile, activityResourceCsvFil
     return fetch(`${API_V1_ENDPOINT}/planned-schedules/csv-import/`, {
         method: 'POST',
         body: formData
+    })
+}
+
+export function deletePlannedSchedules() {
+    return fetch(`${API_V1_ENDPOINT}/planned-schedules/delete/`, {
+        method: 'DELETE',
     })
 }
 
