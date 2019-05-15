@@ -38,6 +38,9 @@ class DurationInfoViewSet(viewsets.ModelViewSet):
         elif request.method == 'POST':
             # 현재 data와 링크시킬 activity들의 id들을 가져온다
             activity_ids = request.data.get('activities', None)
+            description = request.data.get('description', '')
+            name = request.data.get('name', '')
+
             data = self.get_object().datainfo_ptr
 
             # 만일 링크하라고 activity 중 이미 현재 data에 배정된 경우 빼준다
@@ -50,6 +53,10 @@ class DurationInfoViewSet(viewsets.ModelViewSet):
             # 만일 현재 선택한 데이터가 아닌 데이터와 링크되어있는 액티비티가 들어왔으면 400을 띄운다
             if not len(set(activities.values_list('data', flat=True)) - {None, data.data_id}) == 0:
                 return Response(status=HTTP_400_BAD_REQUEST)
+
+            # data의 name, description 업데이트
+            data.name = name
+            data.description = description
 
             # 현재 들어온 Activity의 duration 값의 기초 통계량을 구한다
             stat = activities.aggregate(Sum('duration'), Max('duration'), Min('duration'))
@@ -97,6 +104,8 @@ class ProductivityInfoViewSet(viewsets.ModelViewSet):
             # 현재 data와 링크시킬 activity들의 id들을 가져온다
             activity_ids = request.data.get('activities', None)
             data = self.get_object().datainfo_ptr
+            description = request.data.get('description', '')
+            name = request.data.get('name', '')
 
             activities = Activity.objects.filter(activity_id__in=activity_ids).exclude(data=data)
 
@@ -110,6 +119,10 @@ class ProductivityInfoViewSet(viewsets.ModelViewSet):
 
             # 현재 들어온 Activity의 duration 값의 기초 통계량을 구한다
             stat = activities.aggregate(Sum('productivity'), Max('productivity'), Min('productivity'))
+
+            # data의 name, description 업데이트
+            data.name = name
+            data.description = description
 
             # data 통계량 업데이트
             data.mean = round((data.mean * data.data_cnt + stat['productivity__sum']) / \
