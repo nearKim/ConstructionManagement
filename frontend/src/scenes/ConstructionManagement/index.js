@@ -73,17 +73,6 @@ export default class ConstructionManagement extends Component {
         this.setState(prevState => ({showDanglingActivities: !prevState.showDanglingActivities}))
     }
 
-    deleteActivities() {
-        if (confirm('정말 모든 Activity들을 삭제하시겠습니까?')) {
-            api.deleteActivities().then(res => {
-                if (res.ok) {
-                    alert('성공적으로 삭제되었습니다.')
-                    location.reload()
-                } else alert('에러가 발생하였습니다.')
-            })
-        }
-    }
-
     /* Modal Methods */
 
     // 모달을 열고 타입을 넣어준다
@@ -392,9 +381,6 @@ export default class ConstructionManagement extends Component {
                             <Button outline
                                     color="secondary"
                                     onClick={() => this.showModal(ModalType.ACTIVITY)}>Import activities
-                            </Button>
-                            <Button color="warning"
-                                    onClick={() => this.deleteActivities()}>Truncate activities
                             </Button>
                             <Col sm={{size: 12}}>
                                 <FormGroup check>

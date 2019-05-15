@@ -4,6 +4,36 @@ import Button from "reactstrap/es/Button";
 import * as api from "../../common/api"
 
 export default class NavBar extends Component {
+
+    // Activity를 밀어버린다
+    deleteActivities() {
+        if (confirm('정말 모든 Activity들을 삭제하시겠습니까?')) {
+            api.deleteActivities().then(res => {
+                if (res.ok) {
+                    alert('성공적으로 삭제되었습니다.')
+                    location.reload()
+                } else alert('에러가 발생하였습니다.')
+            })
+        }
+    }
+
+    // PlannedSchedule을 밀어버린다
+    deletePlannedSchedules() {
+        // TODO
+    }
+
+    // Allocation을 밀어버린다
+    deleteAllocations() {
+        if (confirm('정말로 Allocation들을 모두 삭제하시겠습니까?')) {
+            api.deleteAllocations().then(res => {
+                if (res.ok) {
+                    alert('성공적으로 삭제되었습니다.')
+                    location.reload()
+                } else alert('에러가 발생하였습니다.')
+            })
+        }
+    }
+
     // DB를 밀어버린다
     truncateDatabase() {
         if (confirm('정말로 DB를 밀어버리시겠습니까?')) {
@@ -30,6 +60,12 @@ export default class NavBar extends Component {
                         <NavItem>
                             <NavLink href="/planned-schedule/">Planned Schedule management</NavLink>
                         </NavItem>
+                        <Button color="warning"
+                                onClick={() => this.deleteActivities()}>Truncate Activities</Button>
+                        <Button color="warning"
+                                onClick={() => this.deletePlannedSchedules()}>Truncate Planned Schedules</Button>
+                        <Button color="warning"
+                                onClick={() => this.deleteAllocations()}>Truncate Allocations</Button>
                         <Button color="danger"
                                 onClick={() => this.truncateDatabase()}>Flush DB</Button>
                     </Nav>
