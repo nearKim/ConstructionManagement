@@ -200,9 +200,12 @@ class ActivityViewSet(viewsets.ModelViewSet):
             )
             try:
                 # quantity가 Null이거나 Nan이라면 명시적으로 None을 넣어준다
+                project = None if 'projectID' not in df.columns or pd.isnull(row['projectID']) or pd.isna(row['projectID']) else row['projectID']
                 quantity = None if pd.isnull(row['quantity']) or pd.isna(row['quantity']) else row['quantity']
+                resource = None if pd.isnull(row['resourceID']) or pd.isna(row['resourceID']) else row['resourceID']
                 description = None if pd.isnull(row['description']) or pd.isna(row['description']) else row['description']
-                productivity = row['quantity'] / row['duration'] if quantity else None
+                labor_cnt = None if pd.isnull(row['numofLabour']) or pd.isna(row['numofLabour']) else row['numofLabour']
+                productivity = row['quantity'] / row['duration'] if quantity and not row['duration'] == 0 else None
 
                 # Activity를 생성하면서 대분류, 소분류를 모두 넣어준다.
                 a, created = Activity.objects.update_or_create(
@@ -212,9 +215,9 @@ class ActivityViewSet(viewsets.ModelViewSet):
                     duration=row['duration'],
                     quantity=quantity,
                     productivity=productivity,
-                    labor_cnt=row['numofLabour'],
-                    project=row['projectID'],
-                    resource=row['resourceID'],
+                    labor_cnt=labor_cnt,
+                    project=project,
+                    resource=resource,
                     data=None
                 )
                 a.work_package.add(*parent_packages, *child_packages)

@@ -12,7 +12,7 @@ class Activity(TimeStampedMixin):
     description = models.TextField(_('액티비티 설명'), null=True)
     duration = models.PositiveIntegerField(_('기간'), default=0)
     productivity = models.FloatField(_('생산성'), null=True, blank=True)
-    labor_cnt = models.PositiveIntegerField(_('인력 총원'), default=0)
+    labor_cnt = models.PositiveIntegerField(_('인력 총원'), default=0, null=True)
 
     project = models.CharField(_('프로젝트'), null=True, max_length=300)
     resource = models.CharField(_('리소스'), null=True, max_length=300)
