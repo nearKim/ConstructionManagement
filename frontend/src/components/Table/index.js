@@ -6,7 +6,7 @@ export default class Table extends Component {
 
     renderPaginationButtons() {
         let {page, total, pageChangeHandler} = this.props.paginationData
-        const lastPage = parseInt(total / 30)
+        const lastPage = Math.ceil(total / 30)
         const firstPage = 1
 
         return (
