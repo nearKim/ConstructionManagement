@@ -42,7 +42,6 @@ export default class ConstructionManagement extends Component {
         }
 
         this.toggleModal = this.toggleModal.bind(this)
-        this.createProject = this.createProject.bind(this)
     }
 
     componentDidMount() {
@@ -96,17 +95,6 @@ export default class ConstructionManagement extends Component {
         )
     }
 
-    // API를 통해 프로젝트를 생성하고 모달을 닫는다
-    createProject(projectName, projectDescription) {
-        api.createProject(projectName, projectDescription)
-            .then(res => res.json())
-            .then(project => {
-                this.setState({
-                    projects: [...this.state.projects, project],
-                    showModal: false
-                })
-            })
-    }
 
     // Activity가 생성된 경우 결과를 보여주고 새로고침한다.
     // FIXME: csv_import가 던지는 attribute와 get activity가 던지는 attribute가 다르다.
@@ -451,10 +439,7 @@ export default class ConstructionManagement extends Component {
                     <CustomModal modalType={this.state.modalType}
                                  showModal={this.state.showModal}
                                  modalTitle={modalTitle}
-                                 createProjectHandler={this.createProject}
-                                 setStateHandler={this.state.modalType === ModalType.ACTIVITY ?
-                                     (res) => this.setActivityData(res) :
-                                     (res) => this.setResourceData(res)}
+                                 setStateHandler={(res) => this.setActivityData(res)}
                                  toggleModalHandler={this.toggleModal}
                     />
                 </div>
