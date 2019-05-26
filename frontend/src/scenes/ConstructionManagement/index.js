@@ -22,6 +22,10 @@ export default class ConstructionManagement extends Component {
             modalType: '',
             projects: [],
             activities: [],
+            paginationData: {
+                total: null,
+                page: null,
+            },
             resources: [],
             workPackages: [],
             durationInfos: [],
@@ -54,7 +58,8 @@ export default class ConstructionManagement extends Component {
         ).then(res => {
                 this.setState({
                     initialized: true,
-                    activities: res[0],
+                    activities: res[0].results,
+                    paginationData: {total: res[0].count, page: 1},
                     workPackages: res[1],
                     durationInfos: res[2],
                     productivityInfos: res[3]
@@ -134,6 +139,24 @@ export default class ConstructionManagement extends Component {
     }
 
     /* Table Methods */
+
+    // Activity 테이블의 페이지가 바뀌면 새로 데이터를 받아온다
+    onActivityPageChange(page) {
+        this.setState({initialize: false})
+        api.getActivities(page)
+            .then(res => res.json())
+            .then(activities => {
+                this.setState(prevState => ({
+                    initialized: true,
+                    paginationData: {
+                        ...prevState.paginationData,
+                        page
+                    },
+                    activities: activities.results
+                }))
+            })
+    }
+
 
     // 선택된 activity row정보를 state에 저장한다
     onActivityRowSelect(row, isSelected, rowIndex, e) {
@@ -231,7 +254,7 @@ export default class ConstructionManagement extends Component {
                                 ...this.state.selected,
                                 selectedActivities: []
                             },
-                            activities: activities,
+                            activities: activities.results,
                             durationInfos: type === InformationType.DURATION ? [...prevState.durationInfos, res] : prevState.durationInfos,
                             productivityInfos: type === InformationType.PRODUCTIVITY ? [...prevState.productivityInfos, res] : prevState.productivityInfos,
                             dataName: '',
@@ -286,7 +309,7 @@ export default class ConstructionManagement extends Component {
                                 selectedDurationInfos: []
                             },
                             durationInfos: responses[0],
-                            activities: responses[1],
+                            activities: responses[1].results,
                             dataName: '',
                             dataDesc: ''
                         }))
@@ -312,7 +335,7 @@ export default class ConstructionManagement extends Component {
                                 selectedDurationInfos: []
                             },
                             productivityInfos: responses[0],
-                            activities: responses[1],
+                            activities: responses[1].results,
                             dataName: '',
                             dataDesc: ''
                         }))
@@ -398,6 +421,10 @@ export default class ConstructionManagement extends Component {
                                    filter={textFilter({placeholder: ' '})}
                                    selected={this.state.selected.selectedActivities}
                                    rowSelectHandler={(row, isSelected, rowIndex, e) => this.onActivityRowSelect(row, isSelected, rowIndex, e)}
+                                   paginationData={{
+                                       pageChangeHandler: (page) => this.onActivityPageChange(page),
+                                       ...this.state.paginationData
+                                   }}
                                    data={convertData4BootstrapTable(activities)}/>
                         </div>
                         {this.renderMainBtnContainer()}
