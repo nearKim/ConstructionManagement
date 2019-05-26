@@ -53,9 +53,8 @@ export function deleteProject(projectId) {
 /**
  * 액티비티 API
  */
-export function getActivities(workPackages) {
-    let queryRoot = '?work_package='
-    let query = workPackages ? queryRoot + workPackages.join(queryRoot) : ''
+export function getActivities(page=1) {
+    let query = `?page=${page}`
 
     return fetch(`${API_V1_ENDPOINT}/activities${query}`)
 }

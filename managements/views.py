@@ -8,7 +8,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, detail_route
 from rest_framework.response import Response
-from rest_framework.status import HTTP_207_MULTI_STATUS, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR, HTTP_200_OK
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.status import HTTP_207_MULTI_STATUS, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR, \
+    HTTP_200_OK
 
 from ConstructionManagement.constants import InfoType
 from ConstructionManagement.helper import batch_create_workpackages, generate_data_id
@@ -22,7 +24,14 @@ from managements.serializers import (
 )
 
 
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 30
+    page_size_query_param = 'page_size'
+    max_page_size = 10000
+
+
 class ActivityViewSet(viewsets.ModelViewSet):
+    pagination_class = StandardResultsSetPagination
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
@@ -132,7 +141,6 @@ class ActivityViewSet(viewsets.ModelViewSet):
                 return Response(status=HTTP_400_BAD_REQUEST,
                                 data='DurationInfo cannot be updated with Productivity type.')
 
-
             # activity의 data 정보 업데이트
             activity.data = data
             activity.save()
@@ -200,10 +208,12 @@ class ActivityViewSet(viewsets.ModelViewSet):
             )
             try:
                 # quantity가 Null이거나 Nan이라면 명시적으로 None을 넣어준다
-                project = None if 'projectID' not in df.columns or pd.isnull(row['projectID']) or pd.isna(row['projectID']) else row['projectID']
+                project = None if 'projectID' not in df.columns or pd.isnull(row['projectID']) or pd.isna(
+                    row['projectID']) else row['projectID']
                 quantity = None if pd.isnull(row['quantity']) or pd.isna(row['quantity']) else row['quantity']
                 resource = None if pd.isnull(row['resourceID']) or pd.isna(row['resourceID']) else row['resourceID']
-                description = None if pd.isnull(row['description']) or pd.isna(row['description']) else row['description']
+                description = None if pd.isnull(row['description']) or pd.isna(row['description']) else row[
+                    'description']
                 labor_cnt = None if pd.isnull(row['numofLabour']) or pd.isna(row['numofLabour']) else row['numofLabour']
                 productivity = row['quantity'] / row['duration'] if quantity and not row['duration'] == 0 else None
 
@@ -265,4 +275,3 @@ class WorkPackageViewSet(viewsets.ModelViewSet):
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)
-
