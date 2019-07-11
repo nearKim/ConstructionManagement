@@ -55,8 +55,8 @@ class DurationInfoViewSet(viewsets.ModelViewSet):
                 return Response(status=HTTP_400_BAD_REQUEST)
 
             # data의 name, description 업데이트
-            data.name = name
-            data.description = description
+            data.name = name if name else data.name
+            data.description = description if description else data.description
 
             # 현재 들어온 Activity의 duration 값의 기초 통계량을 구한다
             stat = activities.aggregate(Sum('duration'), Max('duration'), Min('duration'))

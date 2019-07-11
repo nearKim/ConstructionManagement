@@ -267,11 +267,6 @@ export default class ConstructionManagement extends Component {
             return
         }
 
-        if (!dataName) {
-            alert('dataName이 없습니다.')
-            return
-        }
-
         let dataId = selectedDurationInfos[0] || selectedProductivityInfos[0]
         let dataInfo = productivityInfos.concat(durationInfos).find(i => i['data_id'] == dataId)
         let activityIds = selectedActivities
