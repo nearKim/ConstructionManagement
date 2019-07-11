@@ -72,3 +72,11 @@ export function pop(obj, key) {
     delete obj[key]
     return entry
 }
+
+/**
+ * 첫글자를 대문자로 치환한다
+ * @param string
+ */
+export function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
