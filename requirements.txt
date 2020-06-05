@@ -1,4 +1,4 @@
-Django==2.1.7
+Django==2.2.13
 django-extensions==2.1.6
 django-webpack-loader==0.6.0
 djangorestframework==3.9.1
